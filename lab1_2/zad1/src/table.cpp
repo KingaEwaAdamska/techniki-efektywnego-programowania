@@ -6,7 +6,7 @@ bool allocTableFill34(int **table, int size){
   }
   *table = new int[size];
   for (int i = 0; i < size; i++){
-    (*table)[i] = val34;
+    (*table)[i] = valueToFill;
   }
   return true;
 }
