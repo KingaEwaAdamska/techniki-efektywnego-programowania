@@ -3,12 +3,10 @@
 
 int main() {
     Number a, b, c;
-    a = 24567;
-    b = 13;
-    a = a / b;
+    a = 9001234;
+    b = 213;
+    a = a - b;
     std::cout << "a: " << a.toStr() << std::endl;
-
-
     // std::cout << "=== TESTY DODAWANIA ===" << std::endl;
     //
     // // Dodatnie + dodatnie

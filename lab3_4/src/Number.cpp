@@ -5,6 +5,7 @@
 
 Number::Number(){
   _table = new uint8_t[defaultLength];
+  _isTemporary = false;
   _length = defaultLength;
   _firstNonZeroDigitId = 0;
   this->set0();
@@ -12,6 +13,7 @@ Number::Number(){
 
 Number::Number(int length){
   _table = new uint8_t[length];
+  _isTemporary = false;
   _length = length;
   _firstNonZeroDigitId = 0;
   this->set0();
@@ -19,6 +21,7 @@ Number::Number(int length){
 
 Number::Number(const Number &other){
   _length = other._length;
+  _isTemporary = false;
   _table = new uint8_t[_length];
   _firstNonZeroDigitId = other._firstNonZeroDigitId;
   _isNegative = other._isNegative;
@@ -71,14 +74,16 @@ void Number::operator=(const Number &value){
   for (int i = 0; i <= _firstNonZeroDigitId; i++){
     _table[i] = value._table[i];
   }
+
+  if (value._isTemporary) delete &value;
 }
 
-Number Number::_addAbsoluteValue(const Number &value) const {
-  Number result((std::max(_firstNonZeroDigitId, value._firstNonZeroDigitId) + 2)); // 2 because 1 for id offset and 1 for adding carry
+Number& Number::_addAbsoluteValue(const Number &value) const {
+  Number *result = new Number((std::max(_firstNonZeroDigitId, value._firstNonZeroDigitId) + 2));
   int buffor = 0;
   int shortSum = 0;
 
-  for (int i = 0; i < result._length; i++) {
+  for (int i = 0; i < result->_length; i++) {
     shortSum += buffor;
     if (i <= _firstNonZeroDigitId){
       shortSum += _table[i];
@@ -86,52 +91,45 @@ Number Number::_addAbsoluteValue(const Number &value) const {
     if (i <= value._firstNonZeroDigitId) {
       shortSum += value._table[i];
     }
-    result._table[i] = shortSum % systemBase;
+    result->_table[i] = shortSum % systemBase;
     buffor = shortSum / systemBase;
     shortSum = 0;
   }
-  if (result._table[result._length - 1] != 0) {
-    result._firstNonZeroDigitId = result._length - 1;
+  
+  if (result->_table[result->_length - 1] != 0) {
+    result->_firstNonZeroDigitId = result->_length - 1;
   } else {
-    result._firstNonZeroDigitId = result._length - 2;
+    result->_firstNonZeroDigitId = result->_length - 2;
   }
 
-  return result;
+  result->_isTemporary = true;
+  return *result;
 }
 
-Number Number::_subtractAbsoluteValue(const Number &value) const{
-  Number result(_firstNonZeroDigitId + 1);
+Number& Number::_subtractAbsoluteValue(const Number &value) const {
+  Number *result = new Number(_firstNonZeroDigitId + 1);
   int buffor = 0;
+  
   for (int i = 0; i <= _firstNonZeroDigitId; i++) {
     buffor += _table[i];
     if (i <= value._firstNonZeroDigitId) {
       buffor -= value._table[i];
     }
     if (buffor < 0) {
-      result._table[i] = buffor + systemBase;
+      result->_table[i] = buffor + systemBase;
       buffor = -1;
     } else {
-      result._table[i] = buffor;
+      result->_table[i] = buffor;
       buffor = 0;
     }
   }
 
-  int i = result._length - 1;
-  int non_zero = 0;
-
-  while (i >= 0 && non_zero == 0) {
-    if (result._table[i] != 0){
-      non_zero = i;
-    }
-    i--;
-  }
-
-  result._normalize();
-
-  return result;
+  result->_normalize();
+  result->_isTemporary = true;
+  return *result;
 }
 
-int Number::_compareAbsoluteValues(const Number &value){
+int Number::_compareAbsoluteValues(const Number &value) const {
   if (_firstNonZeroDigitId > value._firstNonZeroDigitId) return 1;
   if (_firstNonZeroDigitId < value._firstNonZeroDigitId) return -1;
   for (int i = _firstNonZeroDigitId; i >= 0; i--){
@@ -141,64 +139,64 @@ int Number::_compareAbsoluteValues(const Number &value){
   return 0;
 }
 
-Number Number::operator+(const Number &value){
-  Number result;
+Number& Number::operator+(const Number &value){
+  Number *result;
   int comparison = _compareAbsoluteValues(value);
 
   if (_isNegative == value._isNegative){
-    result = _addAbsoluteValue(value);
+    result = &_addAbsoluteValue(value);
   } else if(comparison == 1){
-    result = _subtractAbsoluteValue(value);
+    result = &_subtractAbsoluteValue(value);
   } else {
-    result = value._subtractAbsoluteValue(*this);
+    result = &value._subtractAbsoluteValue(*this);
   }
 
   if (comparison == -1) {
-    result._isNegative = value._isNegative;
+    result->_isNegative = value._isNegative;
   } else{
-    result._isNegative = _isNegative;
+    result->_isNegative = _isNegative;
   }
   
-  return result;
+  result->_isTemporary = true;
+  return *result;
 }
 
-Number Number::operator++(int) {
-    Number temp = *this;  // Zachowaj starą wartość
+void Number::operator++(int) {
+    Number *temp = new Number(*this);
     Number one;
     one = 1;
-    *this = *this + one;  // Zwiększ wartość
-    return temp;          // Zwróć starą wartość
+    *this = *this + one;
 }
 
-Number Number::operator-(const Number &value){
-  Number result;
+Number& Number::operator-(const Number &value) {
+  Number *result;
   int comparison = _compareAbsoluteValues(value);
 
   if (_isNegative != value._isNegative){
-    result = _addAbsoluteValue(value);
+    result = &_addAbsoluteValue(value);
   } else if(comparison == 1){
-    result = _subtractAbsoluteValue(value);
+    result = &_subtractAbsoluteValue(value);
   } else {
-    result = value._subtractAbsoluteValue(*this);
+    result = &value._subtractAbsoluteValue(*this);
   }
 
   if (comparison == -1) {
-    result._isNegative = !value._isNegative;
+    result->_isNegative = !value._isNegative;
   } else{
-    result._isNegative = _isNegative;
+    result->_isNegative = _isNegative;
   }
 
-  result._normalize();
-  
-  return result;
+  result->_normalize();
+  result->_isTemporary = true;
+  return *result;
 }
 
-Number Number::operator*(const Number &value){
-  Number result(_length + value._length);
+Number& Number::operator*(const Number &value){
+  Number *result = new Number(_length + value._length);
   int buffor = 0;
   int shortMultiply = 0;
-  uint8_t *a;
-  uint8_t *b;
+  const uint8_t *a;
+  const uint8_t *b;
   int aLen;
   int bLen;
 
@@ -216,47 +214,57 @@ Number Number::operator*(const Number &value){
 
   for (int i = 0; i < bLen; i++) {
     for (int j = 0; j < aLen; j++) {
-      shortMultiply = buffor + a[j] * b[i] + result._table[i+j];
-      result._table[i+j] = shortMultiply % systemBase;
+      shortMultiply = buffor + a[j] * b[i] + result->_table[i+j];
+      result->_table[i+j] = shortMultiply % systemBase;
       buffor = shortMultiply / systemBase;
     }
   }
 
-  result._isNegative = !(_isNegative == value._isNegative);
-  result._normalize();
-  return result;
+  result->_isNegative = !(_isNegative == value._isNegative);
+  result->_isTemporary = true;
+  result->_normalize();
+  return *result;
 }
 
-Number Number::operator/(const Number &value){
+Number& Number::operator/(const Number &value){
   if (value._firstNonZeroDigitId == -1 || (value._firstNonZeroDigitId == 0 && value._table[0] == 0)) {
     throw std::runtime_error("Division by zero");
   }
-  Number result(_firstNonZeroDigitId + 1);
-  Number tmp(value._firstNonZeroDigitId + 2);
+  
+  Number *result = new Number(_firstNonZeroDigitId + 1);
+  Number *tmp = new Number(value._firstNonZeroDigitId + 2);
   Number systemBaseNum;
   Number currentResult;
+  
   systemBaseNum = systemBase;
   for (int i = _firstNonZeroDigitId; i >= 0; i--) {
-    tmp = tmp * systemBaseNum;
-    tmp._table[0] = _table[i];
-    result = result * systemBaseNum;
+    *tmp = *tmp * systemBaseNum;
+    tmp->_table[0] = _table[i];
+    *result = *result * systemBaseNum;
     currentResult = 0;
     currentResult._normalize();
-    while (tmp._compareAbsoluteValues(value) != -1){
+    
+    while (tmp->_compareAbsoluteValues(value) != -1){
       currentResult++;
-      tmp = tmp - value;
-      tmp._normalize();
+      *tmp = *tmp - value;
+      tmp->_normalize();
     }
-    result = currentResult + result;
+    *result = currentResult + *result;
   }
-  result._isNegative = !(_isNegative == value._isNegative);
-  result._normalize();
-  return result;
+  
+  result->_isNegative = !(_isNegative == value._isNegative);
+  result->_normalize();
+  result->_isTemporary = true;
+  
+  if (tmp->_isTemporary) {
+    delete tmp;
+  }
+  
+  return *result;
 }
 
 std::string Number::toStr() const{
   std::string val;
-  bool numberStarted = false;;
   if (_isNegative){
     val+="-";
   }
@@ -271,34 +279,19 @@ void Number::set0(){
     _table[i] = 0;
   }
   _isNegative = false;
+  _firstNonZeroDigitId = 0;
 }
 
 void Number::_normalize(){
   int i = _length - 1;
-  int non_zero = 0;
+  int nonZero = 0;
 
-  while (i > 0 && non_zero == 0) {
+  while (i > 0 && nonZero == 0) {
     if (_table[i] != 0){
-      non_zero = i;
+      nonZero = i;
     }
     i--;
   }
 
-  _firstNonZeroDigitId = non_zero;
-
+  _firstNonZeroDigitId = nonZero;
 }
-
-// dzielenie przez 0 - zwrócić wynik, który w obiekcie klasy cnmuber informuje że wystąpił błąd -  w tym przypadku nie ma lepszego kanału błędu niż wyjątek - pójdzie mail, dopuszczalny wyjątek
-// w operatorze nie mod liczby argumentow
-// wada zwracania wyniku przez wartość - trzeba zrobić więcej alokaci i dealokacji
-// można korzystać z info czy obiekt jest tymczasowy z flagą np tmp na true
-// nie kasuje na hama argumentu, tylko if tmp == true then delete 
-// wyniki w operatorach zwracać statycznie - brak wycieków i mniej wydajny kod czy alokowac wyniki dynamicznie i minimalizować licznik trupów - 
-// byte zamiast uint8_t
-// stała będąca podstawą systemu liczbowego
-//
-// pytania:
-//    czy klasa musi miec idealną długość tab do liczby
-//    czy chcąc przypisać wartość do tablicy która jest wieksza niz dlugosc tablicy to mam ją powiększyć
-//    czy można użyć uint8_t zamiast int, żeby wyjebać nadmiarowość
-//
