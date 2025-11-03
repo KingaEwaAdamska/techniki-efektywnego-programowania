@@ -27,6 +27,7 @@ class Number {
 
   void operator=(const Number &value);
   Number operator+(const Number &value);
+  Number operator++(int);
   Number operator-(const Number &value);
   Number operator*(const Number &value);
   Number operator/(const Number &value);

@@ -52,7 +52,7 @@ void Number::operator=(int value){
     _changeTabLen(length);
   }
 
-  for (int i = 0; i <= _length ; i++){
+  for (int i = 0; i < _length ; i++){
     _table[i] = value % systemBase;
     value = value / systemBase;
     if (value == 0 && _firstNonZeroDigitId == -1) {
@@ -65,6 +65,7 @@ void Number::operator=(const Number &value){
   if (_length < value._firstNonZeroDigitId + 1){
     _changeTabLen(value._firstNonZeroDigitId + 1);
   }
+  set0();
   _isNegative = value._isNegative;
   _firstNonZeroDigitId = value._firstNonZeroDigitId;
   for (int i = 0; i <= _firstNonZeroDigitId; i++){
@@ -115,7 +116,7 @@ Number Number::_subtractAbsoluteValue(const Number &value) const{
     }
   }
 
-  int i = result._length;
+  int i = result._length - 1;
   int non_zero = 0;
 
   while (i >= 0 && non_zero == 0) {
@@ -124,6 +125,8 @@ Number Number::_subtractAbsoluteValue(const Number &value) const{
     }
     i--;
   }
+
+  result._normalize();
 
   return result;
 }
@@ -159,6 +162,14 @@ Number Number::operator+(const Number &value){
   return result;
 }
 
+Number Number::operator++(int) {
+    Number temp = *this;  // Zachowaj starą wartość
+    Number one;
+    one = 1;
+    *this = *this + one;  // Zwiększ wartość
+    return temp;          // Zwróć starą wartość
+}
+
 Number Number::operator-(const Number &value){
   Number result;
   int comparison = _compareAbsoluteValues(value);
@@ -176,6 +187,8 @@ Number Number::operator-(const Number &value){
   } else{
     result._isNegative = _isNegative;
   }
+
+  result._normalize();
   
   return result;
 }
@@ -210,20 +223,36 @@ Number Number::operator*(const Number &value){
   }
 
   result._isNegative = !(_isNegative == value._isNegative);
-  int i = result._length;
-  int non_zero = 0;
-
-  while (i >= 0 && non_zero == 0) {
-    if (result._table[i] != 0){
-      non_zero = i;
-    }
-    i--;
-  }
-  result._firstNonZeroDigitId = non_zero;
-
+  result._normalize();
   return result;
 }
 
+Number Number::operator/(const Number &value){
+  if (value._firstNonZeroDigitId == -1 || (value._firstNonZeroDigitId == 0 && value._table[0] == 0)) {
+    throw std::runtime_error("Division by zero");
+  }
+  Number result(_firstNonZeroDigitId + 1);
+  Number tmp(value._firstNonZeroDigitId + 2);
+  Number systemBaseNum;
+  Number currentResult;
+  systemBaseNum = systemBase;
+  for (int i = _firstNonZeroDigitId; i >= 0; i--) {
+    tmp = tmp * systemBaseNum;
+    tmp._table[0] = _table[i];
+    result = result * systemBaseNum;
+    currentResult = 0;
+    currentResult._normalize();
+    while (tmp._compareAbsoluteValues(value) != -1){
+      currentResult++;
+      tmp = tmp - value;
+      tmp._normalize();
+    }
+    result = currentResult + result;
+  }
+  result._isNegative = !(_isNegative == value._isNegative);
+  result._normalize();
+  return result;
+}
 
 std::string Number::toStr() const{
   std::string val;
@@ -242,6 +271,21 @@ void Number::set0(){
     _table[i] = 0;
   }
   _isNegative = false;
+}
+
+void Number::_normalize(){
+  int i = _length - 1;
+  int non_zero = 0;
+
+  while (i > 0 && non_zero == 0) {
+    if (_table[i] != 0){
+      non_zero = i;
+    }
+    i--;
+  }
+
+  _firstNonZeroDigitId = non_zero;
+
 }
 
 // dzielenie przez 0 - zwrócić wynik, który w obiekcie klasy cnmuber informuje że wystąpił błąd -  w tym przypadku nie ma lepszego kanału błędu niż wyjątek - pójdzie mail, dopuszczalny wyjątek

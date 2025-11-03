@@ -36,6 +36,24 @@ Table::~Table(){
   std::cout << "usuwam: '" << _name << "'" << std::endl;
 }
 
+void Table::doubleClone(Table **tabClone0, Table **tabClone1){
+  *tabClone0 = this->clone();
+  *tabClone1 = this->clone();
+}
+
+void Table::fillWithNextNumbers(){
+  for (int i = 0; i < _size; i++){
+    _table[i] = i;
+  }
+}
+
+void Table::showAllData(){
+  std::cout << _name << std::endl;
+  for (int i = 0; i < _size; i++){
+    std::cout << _table[i] << " ";
+  }
+  std::cout << std::endl;
+}
 
 void Table::setName(std::string newName){
   _name = newName;
