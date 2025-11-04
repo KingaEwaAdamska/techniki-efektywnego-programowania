@@ -3,98 +3,45 @@
 
 int main() {
     Number a, b, c;
-    a = 9001234;
-    b = 213;
-    a = a - b;
-    std::cout << "a: " << a.toStr() << std::endl;
-    // std::cout << "=== TESTY DODAWANIA ===" << std::endl;
-    //
-    // // Dodatnie + dodatnie
-    // a = 5; b = 3; c = a + b;
-    // std::cout << "5 + 3 = " << c.toStr() << " (8)" << std::endl;
-    //
-    // // Ujemne + ujemne
-    // a = -5; b = -3; c = a + b;
-    // std::cout << "-5 + -3 = " << c.toStr() << " (-8)" << std::endl;
-    //
-    // // Ujemna + dodatnia (dodatnia większa)
-    // a = -3; b = 5; c = a + b;
-    // std::cout << "-3 + 5 = " << c.toStr() << " (2)" << std::endl;
-    //
-    // // Ujemna + dodatnia (ujemna większa)
-    // a = -5; b = 3; c = a + b;
-    // std::cout << "-5 + 3 = " << c.toStr() << " (-2)" << std::endl;
-    //
-    // // Dodatnia + ujemna (dodatnia większa)
-    // a = 5; b = -3; c = a + b;
-    // std::cout << "5 + -3 = " << c.toStr() << " (2)" << std::endl;
-    //
-    // // Dodatnia + ujemna (ujemna większa)
-    // a = 3; b = -5; c = a + b;
-    // std::cout << "3 + -5 = " << c.toStr() << " (-2)" << std::endl;
-    //
-    // // Zera i kombinacje z zerem
-    // a = 0; b = 5; c = a + b;
-    // std::cout << "0 + 5 = " << c.toStr() << " (5)" << std::endl;
-    //
-    // a = 5; b = 0; c = a + b;
-    // std::cout << "5 + 0 = " << c.toStr() << " (5)" << std::endl;
-    //
-    // a = 0; b = 0; c = a + b;
-    // std::cout << "0 + 0 = " << c.toStr() << " (0)" << std::endl;
-    //
-    //
-    // std::cout << "\n=== TESTY ODEJMOWANIA ===" << std::endl;
-    //
-    // // Dodatnie - dodatnie (większa - mniejsza)
-    // a = 5; b = 3; c = a - b;
-    // std::cout << "5 - 3 = " << c.toStr() << " (2)" << std::endl;
-    //
-    // // Dodatnie - dodatnie (mniejsza - większa)
-    // a = 3; b = 5; c = a - b;
-    // std::cout << "3 - 5 = " << c.toStr() << " (-2)" << std::endl;
-    //
-    // // Ujemne - ujemne (większa wartość bezwzględna)
-    // a = -5; b = -3; c = a - b;
-    // std::cout << "-5 - -3 = " << c.toStr() << " (-2)" << std::endl;
-    //
-    // // Ujemne - ujemne (mniejsza wartość bezwzględna)
-    // a = -3; b = -5; c = a - b;
-    // std::cout << "-3 - -5 = " << c.toStr() << " (2)" << std::endl;
-    //
-    // // Ujemna - dodatnia
-    // a = -5; b = 3; c = a - b;
-    // std::cout << "-5 - 3 = " << c.toStr() << " (-8)" << std::endl;
-    //
-    // // Dodatnia - ujemna
-    // a = 5; b = -3; c = a - b;
-    // std::cout << "5 - -3 = " << c.toStr() << " (8)" << std::endl;
-    //
-    // // Kombinacje z zerem
-    // a = 0; b = 5; c = a - b;
-    // std::cout << "0 - 5 = " << c.toStr() << " (-5)" << std::endl;
-    //
-    // a = 5; b = 0; c = a - b;
-    // std::cout << "5 - 0 = " << c.toStr() << " (5)" << std::endl;
-    //
-    // a = 0; b = 0; c = a - b;
-    // std::cout << "0 - 0 = " << c.toStr() << " (0)" << std::endl;
-    //
-    //
-    // std::cout << "\n=== TESTY DUŻYCH LICZB ===" << std::endl;
-    //
-    // a = 1000000; b = 999999; c = a + b;
-    // std::cout << "1000000 + 999999 = " << c.toStr() << " (1999999)" << std::endl;
-    //
-    // a = -1000000; b = -999999; c = a + b;
-    // std::cout << "-1000000 + -999999 = " << c.toStr() << " (-1999999)" << std::endl;
-    //
-    // a = 1000000; b = -999999; c = a + b;
-    // std::cout << "1000000 + -999999 = " << c.toStr() << " (1)" << std::endl;
-    //
-    // a = -1000000; b = 999999; c = a + b;
-    // std::cout << "-1000000 + 999999 = " << c.toStr() << " (-1)" << std::endl;
-    //
+    a = 123; b = 456; c = a + b;
+    std::cout << "123 + 456 = " << c.toStr() << " (579)" << std::endl;
+
+    a = 789; b = -123; c = a + b;
+    std::cout << "789 + (-123) = " << c.toStr() << " (666)" << std::endl;
+
+    a = -456; b = 789; c = a + b;
+    std::cout << "-456 + 789 = " << c.toStr() << " (333)" << std::endl;
+
+    a = 987; b = 654; c = a - b;
+    std::cout << "987 - 654 = " << c.toStr() << " (333)" << std::endl;
+
+    a = 321; b = -123; c = a - b;
+    std::cout << "321 - (-123) = " << c.toStr() << " (444)" << std::endl;
+
+    a = -555; b = 222; c = a - b;
+    std::cout << "-555 - 222 = " << c.toStr() << " (-777)" << std::endl;
+
+    a = 111; b = 9; c = a * b;
+    std::cout << "111 * 9 = " << c.toStr() << " (999)" << std::endl;
+
+    a = 250; b = -4; c = a * b;
+    std::cout << "250 * (-4) = " << c.toStr() << " (-1000)" << std::endl;
+
+    a = -125; b = -8; c = a * b;
+    std::cout << "-125 * (-8) = " << c.toStr() << " (1000)" << std::endl;
+
+    a = 999; b = -3; c = a / b;
+    std::cout << "999 / 3 = " << c.toStr() << " (333)" << std::endl;
+
+    a = 888; b = -4; c = a / b;
+    std::cout << "888 / (-4) = " << c.toStr() << " (-222)" << std::endl;
+
+    a = -750; b = 5; c = a / b;
+    std::cout << "-750 / 5 = " << c.toStr() << " (-150)" << std::endl;
+
+    a = -750; b = -5; c = a / b;
+    std::cout << "-750 / -5 = " << c.toStr() << " (150)" << std::endl;
+
     return 0;
 }
 

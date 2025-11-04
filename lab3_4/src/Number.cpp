@@ -246,7 +246,7 @@ Number& Number::operator/(const Number &value){
     
     while (tmp->_compareAbsoluteValues(value) != -1){
       currentResult++;
-      *tmp = *tmp - value;
+      *tmp = tmp->_subtractAbsoluteValue(value);
       tmp->_normalize();
     }
     *result = currentResult + *result;
