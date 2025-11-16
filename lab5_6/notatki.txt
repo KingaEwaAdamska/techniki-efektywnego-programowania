@@ -1,0 +1,34 @@
+drzewo ctree składa się z node'ów, może miec pole typ, albo może być node jako klasa wirtualna z podklasami innych bytów
+
+klasa czysto wirtualna jako swoje zalety ma: node z liczbą może mieć mniej danych, node 
+cnode op - operacja
+każdy węzeł oprócz zmiennych / stałych musi mieć wskaźniki na dzieci
+
+dynamiczna alokacja dzieci xD 
+
+najlepszą metodą przechowywania jest vector
+
+wspólna implementacja wektora dzieci na poziomie cnode nie wprowadza nadmiaru
+
+każdy node zwraca tostring
+
+WSKAŹNIK NA RODZICA
+
+node* pc_parent
+pctree* pc-tree 
+
+zmienne przechowywać w ctree w obiektach w drzewie w mapie/wektorze
+
+w node var cvariable *pc_var
+
+tworzenie drzewa
+
+cerror
+
+
+
+
+## Pytania
+
+- jakie operacje mają być zaimplementowane, potęgi ? 
+- czy uzytkownik ma mieć możliwość wpisać w drzewie zmienne a,b,c...
