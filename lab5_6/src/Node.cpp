@@ -6,15 +6,27 @@
 static bool isNumber(const std::string& str) {
     if (str.empty()) return false;
     
+    bool hasDecimal = false;
+    bool hasDigit = false;
+    
     for (size_t i = 0; i < str.length(); i++) {
-        if (i == 0 && str[i] == '-' && str.length() > 1) continue;
-        if (!isdigit(str[i])) return false;
+        if (i == 0 && str[i] == '-' && str.length() > 1) {
+            continue;
+        }
+        if (str[i] == '.') {
+            if (hasDecimal) return false;
+            hasDecimal = true;
+        } else if (!isdigit(str[i])) {
+            return false;
+        } else {
+            hasDigit = true;
+        }
     }
-    return true;
+    return hasDigit;
 }
 
 static float stringToFloat(const std::string& str) {
-    return atof(str.c_str());
+    return static_cast<float>(atof(str.c_str()));
 }
 
 // Node
