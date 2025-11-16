@@ -1,83 +1,55 @@
 #include "Node.hpp"
 #include <cmath>
-#include <cstdlib>
-#include <sstream>
-
-static bool isNumber(const std::string& str) {
-    if (str.empty()) return false;
-    
-    bool hasDecimal = false;
-    bool hasDigit = false;
-    
-    for (int i = 0; i < str.length(); i++) {
-        if (i == 0 && str[i] == '-' && str.length() > 1) {
-            continue;
-        }
-        if (str[i] == '.') {
-            if (hasDecimal) return false;
-            hasDecimal = true;
-        } else if (!isdigit(str[i])) {
-            return false;
-        } else {
-            hasDigit = true;
-        }
-    }
-    return hasDigit;
-}
-
-static float stringToFloat(const std::string& str) {
-    return static_cast<float>(atof(str.c_str()));
-}
 
 // Node
 Node* Node::createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables) {
-    Node *node = NULL;
-    
-    if (tokens->size() <= actToken) {
-        status.status = WARNING;
-        status.msg += "\nLack of tokens";
-        return new NumberNode(1);
-    }
-    
-    std::string token = (*tokens)[actToken];
-    actToken++;
-    
-    if (isNumber(token)) {
-        float value = stringToFloat(token);
-        node = new NumberNode(value);
-    } else if (token == "+") {
-        AdditionNode *addNode = new AdditionNode();
-        addNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        addNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = addNode;
-    } else if (token == "-") {
-        SubtractionNode *subNode = new SubtractionNode();
-        subNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        subNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = subNode;
-    } else if (token == "*") {
-        MultiplicationNode *mulNode = new MultiplicationNode();
-        mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = mulNode;
-    } else if (token == "/") {
-        DivisionNode *divNode = new DivisionNode();
-        divNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        divNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = divNode;
-    } else if (token == "sin") {
-        SinusNode *sinNode = new SinusNode();
-        sinNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = sinNode;
-    } else if (token == "cos") {
-        CosinusNode *cosNode = new CosinusNode();
-        cosNode->childs.push_back(createNode(tokens, actToken, status, variables));
-        node = cosNode;
-    } else {
-        node = new VarNode(token, variables);
-    }
-    
-    return node;
+  Node *node = NULL;
+  
+  if (tokens->size() <= actToken) {
+    status.status = WARNING;
+    status.msg += "\nLack of tokens";
+    return new NumberNode(1);
+  }
+  
+  std::string token = (*tokens)[actToken];
+  actToken++;
+  
+  if (StringHandler::isNumber(token)) {
+    float value = StringHandler::stringToFloat(token);
+    node = new NumberNode(value);
+  } else if (token == "+") {
+    AdditionNode *addNode = new AdditionNode();
+    addNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    addNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = addNode;
+  } else if (token == "-") {
+    SubtractionNode *subNode = new SubtractionNode();
+    subNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    subNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = subNode;
+  } else if (token == "*") {
+    MultiplicationNode *mulNode = new MultiplicationNode();
+    mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = mulNode;
+  } else if (token == "/") {
+    DivisionNode *divNode = new DivisionNode();
+    divNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    divNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = divNode;
+  } else if (token == "sin") {
+    SinusNode *sinNode = new SinusNode();
+    sinNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = sinNode;
+  } else if (token == "cos") {
+    CosinusNode *cosNode = new CosinusNode();
+    cosNode->childs.push_back(createNode(tokens, actToken, status, variables));
+    node = cosNode;
+  } else {
+    node = new VarNode(token, variables);
+  }
+  
+  return node;
 }
 
 // Operators

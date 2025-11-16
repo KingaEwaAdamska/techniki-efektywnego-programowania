@@ -18,5 +18,6 @@ add_executable(Lab5_6
     src/Node.cpp
     src/Tree.cpp
     src/CmdInterface.cpp
+    src/StringHandler.cpp
 )
 

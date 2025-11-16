@@ -2,6 +2,7 @@
 #define NODE_HPP
 
 #include "CmdStatus.hpp"
+#include "StringHandler.hpp"
 #include "Variable.hpp"
 #include <string>
 #include <vector>

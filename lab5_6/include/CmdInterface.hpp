@@ -9,11 +9,9 @@
 class CmdInterface {
   private:
     Tree* tree;
-    std::string inputLine;
     std::string command;
-    std::vector<std::string> tokens;
+    std::vector<std::string> *tokens;
 
-    void divideLineIntoTokens();
     CmdStatus enterHandler();
     CmdStatus varsHandler();
     CmdStatus printHandler();
@@ -21,6 +19,7 @@ class CmdInterface {
     CmdStatus joinHandler();
     void helpHandler();
     void showWarning(std::string msg);
+    void showError(std::string msg);
 
   public:
     CmdInterface();

@@ -8,6 +8,10 @@ CmdStatus Tree::createTree(std::vector<std::string> *tokens){
   int actToken = 0;
   root = Node::createNode(tokens, actToken, status, &variables);
 
+  if (actToken < tokens->size()){
+    status.status = WARNING;
+    status.msg = "Your formula was too long";
+  }
   return status;
 }
 
@@ -20,19 +24,21 @@ std::string Tree::getVarsString(){
   return varString;
 }
 
-float Tree::compute(){
+float Tree::compute(std::vector<std::string> *tokens, CmdStatus &status){
+  status.status = SUCCESS;
+  status.msg = "";
   int varSize = variables.size();
-  int tokensSize = tokens.size();
-  if (variables.size() > tokens.size()){
-    status = ERROR;
-    msg = "You do not completed all the variables data";
+  int tokensSize = tokens->size();
+  if (varSize > tokensSize){
+    status.status = ERROR;
+    status.msg = "You do not completed all the variables data";
     return 0.0;
   } else if (tokensSize > varSize){
-    status = WARNING;
-    msg = "You type in too much data";
+    status.status = WARNING;
+    status.msg = "You type in too much data";
   }
   for (int i = 0; i < varSize; i++){
-    
+    variables[i]->value = StringHandler::stringToFloat((*tokens)[i]);
   }
   return root->getValue();
 }

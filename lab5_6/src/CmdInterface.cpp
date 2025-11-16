@@ -1,7 +1,6 @@
 #include "CmdInterface.hpp"
 
 #include <iostream>
-#include <sstream>
 #include <string>
 
 CmdInterface::CmdInterface(){
@@ -14,10 +13,13 @@ CmdInterface::~CmdInterface(){
 
 void CmdInterface::commandHandler() {
   CmdStatus status;
+  std::string inputLine;
   while (true) {
     std::cout << "> ";
     std::getline(std::cin, inputLine);
-    divideLineIntoTokens();
+    tokens = StringHandler::divideLineIntoTokensAndCommand(inputLine, command);
+    status.msg = "";
+    status.status = SUCCESS;
 
     if (command == "exit") {
        return;
@@ -41,53 +43,50 @@ void CmdInterface::commandHandler() {
     else {
       std::cout << "Invalid command" << std::endl;
     }
-    if (status.status == WARNING){
-      std::cout << "WARNING: "<< status.msg << std::endl;
+    if (status.status == WARNING) {
+      showWarning(status.msg);
+    } else if (status.status == ERROR) {
+      showError(status.msg);
     }
-  }
-}
-
-void CmdInterface::divideLineIntoTokens(){
-  tokens.clear();
-
-  std::stringstream ss(inputLine);
-  std::string token;
-
-  if (ss >> token) {
-    command = token;
-  }
-
-  while (ss >> token) {
-    tokens.push_back(token);
+     
   }
 }
 
 CmdStatus CmdInterface::enterHandler(){
   CmdStatus status;
-  status = tree->createTree(&tokens);
+  status = tree->createTree(tokens);
   return status;
 }
 
 CmdStatus CmdInterface::varsHandler(){
   CmdStatus status;
+  status.status = SUCCESS;
+  status.msg = "";
   std::cout << tree->getVarsString() << std::endl;
   return status;
 }
 
 CmdStatus CmdInterface::printHandler(){
   CmdStatus status;
+  status.status = SUCCESS;
+  status.msg = "";
   std::cout << tree->toString() << std::endl;
   return status;
 }
 
 CmdStatus CmdInterface::compHandler(){
   CmdStatus status;
-  std::cout << tree->compute() << std::endl;
+  float result = tree->compute(tokens, status);
+  if (status.status != ERROR){
+    std::cout << result << std::endl;
+  }
   return status;
 }
 
 CmdStatus CmdInterface::joinHandler(){
   CmdStatus status;
+  status.status = SUCCESS;
+  status.msg = "";
   return status;
 }
 
@@ -104,3 +103,11 @@ void CmdInterface::helpHandler() {
     std::cout << std::endl;
 }
 
+
+void CmdInterface::showWarning(std::string msg){
+  std::cout << "WARNING: " << msg << std::endl;
+}
+
+void CmdInterface::showError(std::string msg){
+  std::cout << "ERROR: " << msg << std::endl;
+}
