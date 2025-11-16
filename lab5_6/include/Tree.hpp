@@ -8,9 +8,11 @@
 class Tree {
   private:
     Node* root;
-  
+    std::vector<Variable*> variables;
+
   public:
-    float compute();
+    std::string getVarsString();
+    float compute(CmdStatus &status);
     std::string toString();
     CmdStatus createTree(std::vector<std::string> *tokens);
     ~Tree();

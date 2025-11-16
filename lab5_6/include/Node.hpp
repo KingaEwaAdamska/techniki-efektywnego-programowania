@@ -2,15 +2,19 @@
 #define NODE_HPP
 
 #include "CmdStatus.hpp"
+#include "Variable.hpp"
 #include <string>
 #include <vector>
+
+struct Variable;
+class Tree;
 
 class Node {
   private:
     Node *parent;
 
   public:
-    static Node* createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status);
+    static Node* createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables);
     virtual float getValue() = 0;
     virtual std::string toString() = 0;
     
@@ -74,11 +78,12 @@ class NumberNode : public Node {
 
 class VarNode : public Node {
   private: 
-    std::string name;
+    Variable* var;
+    Variable* addVariable(std::string var, std::vector<Variable*> *variables);
   public:
     float getValue();
     std::string toString();
-    VarNode(std::string name);
+    VarNode(std::string varName, std::vector<Variable*> *variables);
 };
 
 #endif

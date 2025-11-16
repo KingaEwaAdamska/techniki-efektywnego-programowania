@@ -11,6 +11,7 @@ class Number {
 
   void _changeTabLen(int newLength);
   void _normalize();
+  void _shiftByOne();
   Number& _addAbsoluteValue(const Number &value) const;
   Number& _subtractAbsoluteValue(const Number &value) const;
   int _compareAbsoluteValues(const Number &value) const;  // 1 - this is greater, 0 - equal, -1 - this is smaller
@@ -32,7 +33,7 @@ class Number {
   Number& operator-(const Number &value);
   Number& operator*(const Number &value);
   Number& operator/(const Number &value);
-  Number& operator%(Number &value);
+  Number& operator^(const Number &value);
 
   std::string toStr() const;
   void set0();

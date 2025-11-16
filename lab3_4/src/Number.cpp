@@ -195,26 +195,26 @@ Number& Number::operator*(const Number &value){
   Number *result = new Number(_length + value._length);
   int buffor = 0;
   int shortMultiply = 0;
-  const uint8_t *a;
-  const uint8_t *b;
-  int aLen;
-  int bLen;
+  const uint8_t *multiplicand;
+  const uint8_t *multiplier;
+  int multiplicandLen;
+  int multiplierLen;
 
   if (_length >= value._length){
-    a = _table;
-    aLen = _length;
-    b = value._table;
-    bLen = value._length;
+    multiplicand = _table;
+    multiplicandLen = _length;
+    multiplier = value._table;
+    multiplierLen = value._length;
   } else {
-    a = value._table;
-    aLen = value._length;
-    b = _table;
-    bLen = _length;
+    multiplicand = value._table;
+    multiplicandLen = value._length;
+    multiplier = _table;
+    multiplierLen = _length;
   }
 
-  for (int i = 0; i < bLen; i++) {
-    for (int j = 0; j < aLen; j++) {
-      shortMultiply = buffor + a[j] * b[i] + result->_table[i+j];
+  for (int i = 0; i < multiplierLen; i++) {
+    for (int j = 0; j < multiplicandLen; j++) {
+      shortMultiply = buffor + multiplicand[j] * multiplier[i] + result->_table[i+j];
       result->_table[i+j] = shortMultiply % systemBase;
       buffor = shortMultiply / systemBase;
     }
@@ -233,33 +233,49 @@ Number& Number::operator/(const Number &value){
   
   Number *result = new Number(_firstNonZeroDigitId + 1);
   Number *tmp = new Number(value._firstNonZeroDigitId + 2);
-  Number systemBaseNum;
-  Number currentResult;
+  Number *currentResult = new Number;
   
-  systemBaseNum = systemBase;
   for (int i = _firstNonZeroDigitId; i >= 0; i--) {
-    *tmp = *tmp * systemBaseNum;
+    tmp->_shiftByOne();
     tmp->_table[0] = _table[i];
-    *result = *result * systemBaseNum;
-    currentResult = 0;
-    currentResult._normalize();
+    result->_shiftByOne();
+    *currentResult = 0;
+    currentResult->_normalize();
     
     while (tmp->_compareAbsoluteValues(value) != -1){
-      currentResult++;
+      (*currentResult)++;
       *tmp = tmp->_subtractAbsoluteValue(value);
       tmp->_normalize();
     }
-    *result = currentResult + *result;
+    *result = *currentResult + *result;
   }
   
   result->_isNegative = !(_isNegative == value._isNegative);
   result->_normalize();
   result->_isTemporary = true;
   
-  if (tmp->_isTemporary) {
-    delete tmp;
-  }
+  delete tmp;
+  delete currentResult;
   
+  return *result;
+}
+
+Number& Number::operator^(const Number &value){
+  Number *result = new Number(_length);
+  Number *tmp = new Number(1);
+  for (int i = _length - 1; i >= 0; i--) {
+    if (i >= value._length || _table[i] != value._table[i]){
+      result->_shiftByOne();
+      *tmp = _table[i];
+      result->_table[0] = tmp->_table[0];
+    }
+  }
+
+  result->_isNegative = _isNegative;
+  result->_normalize();
+  result->_isTemporary = true;
+
+  delete tmp;
   return *result;
 }
 
@@ -294,4 +310,14 @@ void Number::_normalize(){
   }
 
   _firstNonZeroDigitId = nonZero;
+}
+
+void Number::_shiftByOne(){
+  if (_firstNonZeroDigitId + 1 == _length) {
+    _changeTabLen(_length + 1);
+  }
+  for (int i = _length - 1; i > 0; i--) {
+    _table[i] = _table[i-1];
+  }
+  _table[0] = 0;
 }

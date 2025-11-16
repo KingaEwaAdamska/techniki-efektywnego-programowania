@@ -3,6 +3,12 @@
 
 int main() {
     Number a, b, c;
+    a = 91234567;
+    // b = 921234567;
+    // b = 91234567;
+    b = 14532;
+    c = a^b;
+    std::cout << "c: " << c.toStr() << std::endl;
     a = 123; b = 456; c = a + b;
     std::cout << "123 + 456 = " << c.toStr() << " (579)" << std::endl;
 
@@ -30,7 +36,7 @@ int main() {
     a = -125; b = -8; c = a * b;
     std::cout << "-125 * (-8) = " << c.toStr() << " (1000)" << std::endl;
 
-    a = 999; b = -3; c = a / b;
+    a = 999; b = 3; c = a / b;
     std::cout << "999 / 3 = " << c.toStr() << " (333)" << std::endl;
 
     a = 888; b = -4; c = a / b;

@@ -1,0 +1,7 @@
+## Info od Arka
+
+LcVRP Capacitated Vehicle Routing Problem
+
+Stacje różnią się złożonością i trudnością
+
+400 rdzeni wirtualnych

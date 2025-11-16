@@ -9,7 +9,7 @@ static bool isNumber(const std::string& str) {
     bool hasDecimal = false;
     bool hasDigit = false;
     
-    for (size_t i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); i++) {
         if (i == 0 && str[i] == '-' && str.length() > 1) {
             continue;
         }
@@ -30,7 +30,7 @@ static float stringToFloat(const std::string& str) {
 }
 
 // Node
-Node* Node::createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status) {
+Node* Node::createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables) {
     Node *node = NULL;
     
     if (tokens->size() <= actToken) {
@@ -47,34 +47,34 @@ Node* Node::createNode(std::vector<std::string> *tokens, int &actToken, CmdStatu
         node = new NumberNode(value);
     } else if (token == "+") {
         AdditionNode *addNode = new AdditionNode();
-        addNode->childs.push_back(createNode(tokens, actToken, status));
-        addNode->childs.push_back(createNode(tokens, actToken, status));
+        addNode->childs.push_back(createNode(tokens, actToken, status, variables));
+        addNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = addNode;
     } else if (token == "-") {
         SubtractionNode *subNode = new SubtractionNode();
-        subNode->childs.push_back(createNode(tokens, actToken, status));
-        subNode->childs.push_back(createNode(tokens, actToken, status));
+        subNode->childs.push_back(createNode(tokens, actToken, status, variables));
+        subNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = subNode;
     } else if (token == "*") {
         MultiplicationNode *mulNode = new MultiplicationNode();
-        mulNode->childs.push_back(createNode(tokens, actToken, status));
-        mulNode->childs.push_back(createNode(tokens, actToken, status));
+        mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
+        mulNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = mulNode;
     } else if (token == "/") {
         DivisionNode *divNode = new DivisionNode();
-        divNode->childs.push_back(createNode(tokens, actToken, status));
-        divNode->childs.push_back(createNode(tokens, actToken, status));
+        divNode->childs.push_back(createNode(tokens, actToken, status, variables));
+        divNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = divNode;
     } else if (token == "sin") {
         SinusNode *sinNode = new SinusNode();
-        sinNode->childs.push_back(createNode(tokens, actToken, status));
+        sinNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = sinNode;
     } else if (token == "cos") {
         CosinusNode *cosNode = new CosinusNode();
-        cosNode->childs.push_back(createNode(tokens, actToken, status));
+        cosNode->childs.push_back(createNode(tokens, actToken, status, variables));
         node = cosNode;
     } else {
-        node = new VarNode(token);
+        node = new VarNode(token, variables);
     }
     
     return node;
@@ -166,14 +166,29 @@ std::string NumberNode::toString() {
 
 // Var
 
-VarNode::VarNode(std::string name){
-  this->name = name;
+VarNode::VarNode(std::string varName, std::vector<Variable*> *variables){
+  var = addVariable(varName, variables);
 }
 
 float VarNode::getValue() {
-  return 0;
+  return var->value;
 }
 
 std::string VarNode::toString() {
-  return name;
+  return var->name;
+}
+
+Variable* VarNode::addVariable(std::string var, std::vector<Variable*> *variables) {
+  int size = variables->size();
+  std::string varString;
+  Variable *actVar = NULL;
+  for (int i = 0; i < size; i++){
+    actVar = (*variables)[i];
+    if (actVar->name == var){
+      actVar->occurrings++; 
+      return actVar;
+    }
+  }
+  variables->push_back(new Variable(var));
+  return (*variables)[size];
 }
