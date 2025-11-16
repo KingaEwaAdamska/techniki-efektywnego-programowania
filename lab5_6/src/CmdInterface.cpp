@@ -104,10 +104,10 @@ void CmdInterface::helpHandler() {
 }
 
 
-void CmdInterface::showWarning(std::string msg){
+void CmdInterface::showWarning(const std::string &msg){
   std::cout << "WARNING: " << msg << std::endl;
 }
 
-void CmdInterface::showError(std::string msg){
+void CmdInterface::showError(const std::string &msg){
   std::cout << "ERROR: " << msg << std::endl;
 }

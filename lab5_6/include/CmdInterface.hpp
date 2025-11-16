@@ -18,8 +18,8 @@ class CmdInterface {
     CmdStatus compHandler();
     CmdStatus joinHandler();
     void helpHandler();
-    void showWarning(std::string msg);
-    void showError(std::string msg);
+    void showWarning(const std::string &msg);
+    void showError(const std::string &msg);
 
   public:
     CmdInterface();

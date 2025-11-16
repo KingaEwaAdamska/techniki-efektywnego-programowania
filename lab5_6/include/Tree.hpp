@@ -12,9 +12,9 @@ class Tree {
 
   public:
     std::string getVarsString();
-    float compute(std::vector<std::string> *tokens, CmdStatus &status);
+    float compute(const std::vector<std::string> *tokens, CmdStatus &status);
     std::string toString();
-    CmdStatus createTree(std::vector<std::string> *tokens);
+    CmdStatus createTree(const std::vector<std::string> *tokens);
     ~Tree();
 };
 #endif

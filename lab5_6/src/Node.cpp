@@ -2,7 +2,7 @@
 #include <cmath>
 
 // Node
-Node* Node::createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables) {
+Node* Node::createNode(const std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables) {
   Node *node = NULL;
   
   if (tokens->size() <= actToken) {

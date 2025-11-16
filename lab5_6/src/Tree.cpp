@@ -1,6 +1,6 @@
 #include "Tree.hpp"
 
-CmdStatus Tree::createTree(std::vector<std::string> *tokens){
+CmdStatus Tree::createTree(const std::vector<std::string> *tokens){
   if (root != NULL){
     delete root;
   }
@@ -24,7 +24,7 @@ std::string Tree::getVarsString(){
   return varString;
 }
 
-float Tree::compute(std::vector<std::string> *tokens, CmdStatus &status){
+float Tree::compute(const std::vector<std::string> *tokens, CmdStatus &status){
   status.status = SUCCESS;
   status.msg = "";
   int varSize = variables.size();

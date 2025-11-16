@@ -15,7 +15,7 @@ class Node {
     Node *parent;
 
   public:
-    static Node* createNode(std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables);
+    static Node* createNode(const std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables);
     virtual float getValue() = 0;
     virtual std::string toString() = 0;
     

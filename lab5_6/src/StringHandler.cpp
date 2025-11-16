@@ -1,6 +1,6 @@
 #include "StringHandler.hpp"
 
-std::vector<std::string>* StringHandler::divideLineIntoTokensAndCommand(std::string &line, std::string &command){
+std::vector<std::string>* StringHandler::divideLineIntoTokensAndCommand(const std::string &line, std::string &command){
   std::vector<std::string> *tokens = new std::vector<std::string>;
 
   std::stringstream ss(line);
