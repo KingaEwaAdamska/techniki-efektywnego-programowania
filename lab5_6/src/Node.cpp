@@ -2,6 +2,16 @@
 #include <cmath>
 
 // Node
+Node::Node(Node *parent){
+  this->parent = parent;
+}
+
+Node::~Node() {}
+
+Node* Node::getParent(){
+  return parent;
+}
+
 Node* Node::createNode(const std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables) {
   Node *node = NULL;
   
@@ -53,77 +63,119 @@ Node* Node::createNode(const std::vector<std::string> *tokens, int &actToken, Cm
 }
 
 // Operators
-  OperatorNode::~OperatorNode() {
-    for (float i = 0; i < childs.size(); i++) {
-        delete childs[i];
-    }
+
+OperatorNode::OperatorNode(Node *parent) : Node(parent) {}
+
+OperatorNode::~OperatorNode() {
+  for (float i = 0; i < childs.size(); i++) {
+      delete childs[i];
   }
+}
+
+Node* OperatorNode::getLeaf() {
+  return childs[0]->getLeaf(); 
+}
+
+void OperatorNode::changeChild(Node *newChild){
+  Node *childToDel = childs[0];
+  childs[0] = newChild;
+  delete childToDel;
+}
+
+void OperatorNode::joinSubtreeRoot(Node *subtreeRoot, OperatorNode *actNode){
+  Node *node = actNode->childs[0];
+  OperatorNode* op = dynamic_cast<OperatorNode*>(node);
+  if (op != NULL) {
+    OperatorNode::joinSubtreeRoot(subtreeRoot, op);
+  } else {
+    Node *toDel = node;
+    actNode->childs[0] = subtreeRoot;
+    delete toDel;
+  }
+}
+
   // +
 
-  float AdditionNode::getValue(){
-    return childs[0]->getValue() + childs[1]->getValue();
-  }
+AdditionNode::AdditionNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string AdditionNode::toString(){
-    return " + " + childs[0]->toString() + " " + childs[1]->toString();
-  }
+float AdditionNode::getValue(){
+  return childs[0]->getValue() + childs[1]->getValue();
+}
+
+std::string AdditionNode::toString(){
+  return " + " + childs[0]->toString() + " " + childs[1]->toString();
+}
 
   // -
 
-  float SubtractionNode::getValue(){
-    return childs[0]->getValue() - childs[1]->getValue();
-  }
+SubtractionNode::SubtractionNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string SubtractionNode::toString(){
-    return " - " + childs[0]->toString() + " " + childs[1]->toString();
-  }
+float SubtractionNode::getValue(){
+  return childs[0]->getValue() - childs[1]->getValue();
+}
+
+std::string SubtractionNode::toString(){
+  return " - " + childs[0]->toString() + " " + childs[1]->toString();
+}
 
   // *
 
-  float MultiplicationNode::getValue(){
-    return childs[0]->getValue() * childs[1]->getValue();
-  }
+MultiplicationNode::MultiplicationNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string MultiplicationNode::toString(){
-    return " * " + childs[0]->toString() + " " + childs[1]->toString();
-  }
+float MultiplicationNode::getValue(){
+  return childs[0]->getValue() * childs[1]->getValue();
+}
+
+std::string MultiplicationNode::toString(){
+  return " * " + childs[0]->toString() + " " + childs[1]->toString();
+}
 
   // /
 
-  float DivisionNode::getValue(){
-    return childs[0]->getValue() / childs[1]->getValue();
-  }
+DivisionNode::DivisionNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string DivisionNode::toString(){
-    return " / " + childs[0]->toString() + " " + childs[1]->toString();
-  }
+float DivisionNode::getValue(){
+  return childs[0]->getValue() / childs[1]->getValue();
+}
+
+std::string DivisionNode::toString(){
+  return " / " + childs[0]->toString() + " " + childs[1]->toString();
+}
 
   // sin
 
-  float SinusNode::getValue(){
-    return std::sin(childs[0]->getValue());
-  }
+SinusNode::SinusNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string SinusNode::toString(){
-    return " sin " + childs[0]->toString();
-  }
+float SinusNode::getValue(){
+  return std::sin(childs[0]->getValue());
+}
+
+std::string SinusNode::toString(){
+  return " sin " + childs[0]->toString();
+}
 
   // cos
 
-  float CosinusNode::getValue(){
-    return std::cos(childs[0]->getValue());
-  }
+CosinusNode::CosinusNode(Node *parent) : OperatorNode(parent) {}
 
-  std::string CosinusNode::toString(){
-    return " cos " + childs[0]->toString();
-  }
+float CosinusNode::getValue(){
+  return std::cos(childs[0]->getValue());
+}
+
+std::string CosinusNode::toString(){
+  return " cos " + childs[0]->toString();
+}
 
 
 
 // Number
 
-NumberNode::NumberNode(float val){
+NumberNode::NumberNode(float val, Node *parent) : Node(parent){
   value = val;
+}
+
+Node* NumberNode::getLeaf() {
+  return this;
 }
 
 float NumberNode::getValue(){
@@ -137,9 +189,27 @@ std::string NumberNode::toString() {
 }
 
 // Var
+VarNode::VarNode(std::string varName, std::vector<Variable*> *variables, Node *parent) 
+  : Node(parent), var(addVariable(varName, variables)) {
+  this->variables = variables;
+}
 
-VarNode::VarNode(std::string varName, std::vector<Variable*> *variables){
-  var = addVariable(varName, variables);
+VarNode::~VarNode() {
+  var->occurrings--;
+  if (var->occurrings == 0) {
+    for (std::vector<Variable*>::iterator it = variables->begin();
+         it != variables->end(); )
+    {
+        if (*it == var) {
+            delete *it;
+            it = variables->erase(it);
+            var = NULL;
+            return;
+        } else {
+            ++it;
+        }
+    }
+  }
 }
 
 float VarNode::getValue() {
@@ -148,6 +218,10 @@ float VarNode::getValue() {
 
 std::string VarNode::toString() {
   return var->name;
+}
+
+Node* VarNode::getLeaf() {
+  return this;
 }
 
 Variable* VarNode::addVariable(std::string var, std::vector<Variable*> *variables) {

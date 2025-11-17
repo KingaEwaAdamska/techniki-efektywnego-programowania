@@ -4,6 +4,6 @@ struct Variable{
   int value;
   Variable(std::string name){
     this->name = name;
-    occurrings = 0;
+    occurrings = 1;
   }
 };

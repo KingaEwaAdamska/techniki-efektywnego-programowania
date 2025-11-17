@@ -70,7 +70,10 @@ CmdStatus CmdInterface::printHandler(){
   CmdStatus status;
   status.status = SUCCESS;
   status.msg = "";
-  std::cout << tree->toString() << std::endl;
+  std::string result = tree->toString(status);
+  if (status.status != ERROR){
+    std::cout << result << std::endl;
+  }
   return status;
 }
 
@@ -87,6 +90,7 @@ CmdStatus CmdInterface::joinHandler(){
   CmdStatus status;
   status.status = SUCCESS;
   status.msg = "";
+  tree->join(tokens, status);
   return status;
 }
 
