@@ -1,0 +1,3 @@
+zaimplementowanie dwóch klas error i result
+
+chodzi tylko o to zeby cResult od void przeszedł to nie ma byc osobna klasa
