@@ -1,5 +1,6 @@
 #ifndef INTERFACE_HPP
 #define INTERFACE_HPP
+#define LOG_FILE "log.txt"
 
 #include "Tree.hpp"
 #include "Logger.hpp"

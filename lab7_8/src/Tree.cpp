@@ -1,6 +1,6 @@
 #include "Tree.hpp"
 
-Result<void, Error> Tree::createTree(const std::vector<std::string> *tokens){
+Result<Tree*, Error> Tree::createTree(const std::vector<std::string> *tokens){
   if (root != NULL){
     delete root;
   }
@@ -8,7 +8,7 @@ Result<void, Error> Tree::createTree(const std::vector<std::string> *tokens){
   int actToken = 0;
   Result<Node*, Error> createNodeRes = Node::createNode(tokens, actToken, &variables);
   root = createNodeRes.getValue();
-  Result<void, Error> res;
+  Result<Tree*, Error> res(this);
   res.joinErrors(createNodeRes.getErrors());
   if (actToken < tokens->size()){
     res.addError(new Error("Your formula was too long"));
@@ -57,19 +57,19 @@ Result<float, Error> Tree::compute(const std::vector<std::string> *tokens){
   return res;
 }
 
-Result<void, Error> Tree::join(const std::vector<std::string> *tokens) {
+Result<Tree*, Error> Tree::join(const std::vector<std::string> *tokens) {
   if (root == NULL) {
-    return Result<void, Error>::fail(new Error("There is no tree to join to"));
+    return Result<Tree*, Error>::fail(new Error("There is no tree to join to"));
   }
 
   int actToken = 0;
   Result<Node*, Error> createNodeRes = Node::createNode(tokens, actToken, &variables);
 
-  if (!createNodeRes.isSuccess()) return Result<void, Error>::fail(createNodeRes.getErrors());
+  if (!createNodeRes.isSuccess()) return Result<Tree*, Error>::fail(createNodeRes.getErrors());
 
   Node *subtreeRoot = createNodeRes.getValue();
 
-  Result<void, Error> res;
+  Result<Tree*, Error> res(this);
   res.joinErrors(createNodeRes.getErrors());
 
   OperatorNode* op = dynamic_cast<OperatorNode*>(root);
@@ -95,3 +95,22 @@ Tree::~Tree(){
     delete root;
   }
 }
+
+template <>
+std::string Result<Tree*, Error>::errorsToString() {
+  std::string result = "Tree: ";
+  if (_value && *_value) {
+    result += (*_value)->toString() + "\n";
+  } else {
+    result += "NULL\n";
+  }
+  int size = _errors.size();
+  for (int i = 0; i < size; i++) {
+    if (!result.empty()) {
+      result += "\n";
+    }
+    result += _errors[i]->toString();
+  }
+  return result;
+}
+ 

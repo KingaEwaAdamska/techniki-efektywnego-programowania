@@ -5,6 +5,7 @@
 
 CmdInterface::CmdInterface(){
   tree = new Tree;
+  logger = new Logger(LOG_FILE);
 }
 
 CmdInterface::~CmdInterface(){
@@ -45,41 +46,59 @@ void CmdInterface::commandHandler() {
 }
 
 void CmdInterface::enterHandler(){
-  Result<void, Error> result = tree->createTree(tokens);
-  std::cout << result.errorsToString() << std::endl;
+  Result<Tree*, Error> result = tree->createTree(tokens);
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::varsHandler(){
   Result<std::string, Error> result = tree->getVarsString();
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
-  std::cout << result.errorsToString() << std::endl;
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::printHandler(){
   Result<std::string, Error> result = tree->toString();
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
-  std::cout << result.errorsToString() << std::endl;
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::compHandler(){
   Result<float, Error> result = tree->compute(tokens);
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
-  std::cout << result.errorsToString() << std::endl;
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::joinHandler(){
-  Result<void, Error> result = tree->join(tokens);
-  std::cout << result.errorsToString() << std::endl;
+  Result<Tree*, Error> result = tree->join(tokens);
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::countLeafsHandler() {
   Result<int, Error> result = tree->countLeafs();
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
-  std::cout << result.errorsToString() << std::endl;
+  if (result.errorsExist()){
+    std::cout << result.errorsToString() << std::endl;
+    logger->logResult(result);
+  }
 }
 
 void CmdInterface::helpHandler() {

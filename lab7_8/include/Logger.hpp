@@ -13,14 +13,7 @@ class Logger {
 
     template <typename T, typename E>
     void logResult(Result<T, E>& result) {
-      _logFile << _getCurrentTime() << " " << result.errorsToString();
-    }
-
-    template <typename E>
-    void logResult(Result<Tree*, E>& result) {
-      Tree* tree = result.getValue(); 
-      std::string val = tree->toString();
-      _logFile << _getCurrentTime() << "Tree: " << val << std::endl << result.errorsToString();
+      _logFile << _getCurrentTime() << " " << result.errorsToString() << std::endl;
     }
 
   private:

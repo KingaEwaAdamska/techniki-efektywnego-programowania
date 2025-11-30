@@ -1,136 +1,184 @@
+#pragma once
+
 #include <vector>
+#include "Error.hpp"
 
-template < typename T, typename E>
+class Tree;
+
+template <typename T, typename E>
 class Result {
-  public:
+public:
+    Result();
+    Result(const T& value);
+    Result(const T& value, E* error);
+    Result(E* error);
+    Result(std::vector<E*>& errors);
+    Result(const Result<T, E>& other);
+    ~Result();
 
-    Result<T, E>(){
-      _value = NULL;
-    }
+    static Result<T, E> ok(const T& value);
+    static Result<T, E> warning(const T& value, E* error);
+    static Result<T, E> fail(E* error);
+    static Result<T, E> fail(std::vector<E*>& errors);
 
-    Result<T, E>(const T& value){
-      this->_value = new T(value);
-    }
+    Result<T, E>& operator=(const Result<T, E>& other);
 
-    Result<T, E>(const T& value, E* error){
-      this->_value = new T(value);
-      _errors.push_back(error);
-    }
+    bool isSuccess();
+    bool errorsExist();
+    T& getValue();
+    std::vector<E*>& getErrors();
+    void joinErrors(const Result<T, E>& other);
+    void addValue(const T& val);
+    void addError(E* error);
+    std::string errorsToString();
 
-    Result<T, E>(E* error){
-      _value = NULL;
-      _errors.push_back(error);
-    }
+private:
+    T* _value;
+    std::vector<E*> _errors;
+};
 
-    Result<T, E>(std::vector<E*>& errors){
-      this->_value = 0;
-      int size = _errors.size();
+template<typename T, typename E>
+Result<T, E>::Result() {
+    _value = NULL;
+}
 
-      for (int i = 0; i < size; i++) {
+template<typename T, typename E>
+Result<T, E>::Result(const T& value) {
+    this->_value = new T(value);
+}
+
+template<typename T, typename E>
+Result<T, E>::Result(const T& value, E* error) {
+    this->_value = new T(value);
+    _errors.push_back(error);
+}
+
+template<typename T, typename E>
+Result<T, E>::Result(E* error) {
+    _value = NULL;
+    _errors.push_back(error);
+}
+
+template<typename T, typename E>
+Result<T, E>::Result(std::vector<E*>& errors) {
+    this->_value = NULL;
+    int size = errors.size();
+
+    for (int i = 0; i < size; i++) {
         this->_errors.push_back(new E(*(errors[i])));
-      }
     }
+}
 
-    Result<T, E>(const Result<T, E>& other){
-      if (other._value) {
+template<typename T, typename E>
+Result<T, E>::Result(const Result<T, E>& other) {
+    if (other._value) {
         this->_value = new T(*other._value);
-      } else {
+    } else {
         this->_value = NULL;
-      }
+    }
 
-      int size = other._errors.size();
+    int size = other._errors.size();
 
-      for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         this->_errors.push_back(new E(*(other._errors[i])));
-      }
     }
+}
 
-    ~Result<T, E>(){
-      delete _value;
-      int errorsSize = _errors.size();
-      for (int i = 0; i < errorsSize; i++) {
+template<typename T, typename E>
+Result<T, E>::~Result() {
+    delete _value;
+    int errorsSize = _errors.size();
+    for (int i = 0; i < errorsSize; i++) {
         delete _errors[i];
-      }
     }
+}
 
-    static Result<T, E> ok(const T& value) {
-      return Result<T, E>(value);
-    }
+template<typename T, typename E>
+Result<T, E> Result<T, E>::ok(const T& value) {
+    return Result<T, E>(value);
+}
 
-    static Result<T, E> warning(const T& value, E* error) {
-      return Result<T, E>(value, error);
-    }
+template<typename T, typename E>
+Result<T, E> Result<T, E>::warning(const T& value, E* error) {
+    return Result<T, E>(value, error);
+}
 
-    static Result<T, E> fail(E* error) {
-      return Result<T,E>(error);
-    }
+template<typename T, typename E>
+Result<T, E> Result<T, E>::fail(E* error) {
+    return Result<T, E>(error);
+}
 
-    static Result<T, E> fail(std::vector<E*>& errors) {
-      return Result<T, E>(errors);
-    }
+template<typename T, typename E>
+Result<T, E> Result<T, E>::fail(std::vector<E*>& errors) {
+    return Result<T, E>(errors);
+}
 
-    Result<T, E>& operator=(const Result<T, E>& other) {
-      if (this != &other) {
+template<typename T, typename E>
+Result<T, E>& Result<T, E>::operator=(const Result<T, E>& other) {
+    if (this != &other) {
         delete this->_value;
 
         if (other._value)
-          this->_value = new T(*other._value);
+            this->_value = new T(*other._value);
         else
-          this->_value = NULL;
+            this->_value = NULL;
 
         this->_errors = other._errors;
-      }
-      return *this;
     }
+    return *this;
+}
 
-    bool isSuccess(){
-      return this->_value != NULL;
-    }
+template<typename T, typename E>
+bool Result<T, E>::isSuccess() {
+    return this->_value != NULL;
+}
 
-    bool errorsExist() {
-      return _errors.empty();
-    }
+template<typename T, typename E>
+bool Result<T, E>::errorsExist() {
+    return !_errors.empty();
+}
 
-    T& getValue(){
-      return *this->_value;
-    }
+template<typename T, typename E>
+T& Result<T, E>::getValue() {
+    return *this->_value;
+}
 
-    std::vector<E*>& getErrors(){
-      return this->_errors;
-    }
+template<typename T, typename E>
+std::vector<E*>& Result<T, E>::getErrors() {
+    return this->_errors;
+}
 
-    void joinErrors(const Result<T, E>& other) {
-      int size = other._errors.size();
-      for (int i = 0; i < size; i++) {
+template<typename T, typename E>
+void Result<T, E>::joinErrors(const Result<T, E>& other) {
+    int size = other._errors.size();
+    for (int i = 0; i < size; i++) {
         E* copied_error = new E(*(other._errors[i]));
         this->_errors.push_back(copied_error);
-      }
     }
+}
 
-    void addValue(const T& val) {
-      _value =  new T(val);
+template<typename T, typename E>
+void Result<T, E>::addValue(const T& val) {
+    _value = new T(val);
+}
+
+template<typename T, typename E>
+void Result<T, E>::addError(E* error) {
+    _errors.push_back(error);
+}
+
+template<typename T, typename E>
+std::string Result<T, E>::errorsToString() {
+  std::string result = "";
+  int size = _errors.size();
+  for (int i = 0; i < size; i++) {
+    if (!result.empty()) {
+      result += "\n";
     }
-
-    void addError(E* error) {
-      _errors.push_back(error);
-    }
-
-    std::string errorsToString() {
-      std::string result = "";
-      int size = _errors.size();
-      for (int i = 0; i < size; i++) {
-        if (!result.empty()) {
-          result += "\n";
-        }
-        result += _errors[i]->toString();
-      }
-      return result;
-    }
-
-  private:
-    T *_value;
-    std::vector<E*> _errors;
-};
+    result += _errors[i]->toString();
+  }
+  return result;
+}
 
 template<typename E>
 class Result<void, E> {
@@ -213,3 +261,4 @@ private:
     std::vector<E*> _errors;
     bool _success;
 };
+
