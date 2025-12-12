@@ -1,7 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include "CmdStatus.hpp"
 #include "StringHandler.hpp"
 #include "Variable.hpp"
 #include <string>
@@ -13,13 +12,13 @@ class Tree;
 class Node {
   public:
     virtual ~Node();
-    virtual Node* getLeaf() = 0;
+    virtual int getLeafAmount() = 0;
     virtual float getValue() = 0;
     virtual std::string toString() = 0;
 
     Node* getParent();
 
-    static Node* createNode(const std::vector<std::string> *tokens, int &actToken, CmdStatus &status, std::vector<Variable*> *variables);
+    static Result<Node*,Error> createNode(const std::vector<std::string> *tokens, int &actToken, std::vector<Variable*> *variables);
 
     Node(Node *parent = NULL);
 
@@ -32,7 +31,7 @@ class OperatorNode : public Node {
 
   public:
     ~OperatorNode();
-    Node* getLeaf();
+    int getLeafAmount();
     void changeChild(Node *newChild);
     static void joinSubtreeRoot(Node *subtreeRoot, OperatorNode *actNode);
 
@@ -95,7 +94,7 @@ class NumberNode : public Node {
   public:
     float getValue();
     std::string toString();
-    Node* getLeaf();
+    int getLeafAmount();
 
     NumberNode(float val, Node *parent = NULL);
 
@@ -107,7 +106,7 @@ class VarNode : public Node {
   public:
     float getValue();
     std::string toString();
-    Node* getLeaf();
+    int getLeafAmount();
     ~VarNode();
 
     VarNode(std::string varName, std::vector<Variable*> *variables, Node *parent = NULL);

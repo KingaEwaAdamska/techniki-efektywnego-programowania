@@ -16,6 +16,15 @@ CmdStatus Tree::createTree(const std::vector<std::string> *tokens){
   return status;
 }
 
+int Tree::countLeafs(CmdStatus &status) {
+  if (root == NULL) {
+    status.status = ERROR;
+    status.msg = "There is no tree to count leafs, first enter tree";
+    return 0;
+  }
+  return root->getLeafAmount();
+}
+
 std::string Tree::getVarsString(){
   int size = variables.size();
   std::string varString;
@@ -26,6 +35,11 @@ std::string Tree::getVarsString(){
 }
 
 float Tree::compute(const std::vector<std::string> *tokens, CmdStatus &status){
+  if (root == NULL) {
+    status.status = ERROR;
+    status.msg = "There is no tree to compute";
+    return 0.0;
+  }
   status.status = SUCCESS;
   status.msg = "";
   int varSize = variables.size();

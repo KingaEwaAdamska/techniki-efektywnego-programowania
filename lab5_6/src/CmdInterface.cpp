@@ -39,8 +39,9 @@ void CmdInterface::commandHandler() {
       status = joinHandler();
     } else if (command == "help") {
       helpHandler();
-    }
-    else {
+    } else if (command == "countLeafs") {
+      status = countLeafsHandler();
+    } else {
       std::cout << "Invalid command" << std::endl;
     }
     if (status.status == WARNING) {
@@ -91,6 +92,17 @@ CmdStatus CmdInterface::joinHandler(){
   status.status = SUCCESS;
   status.msg = "";
   tree->join(tokens, status);
+  return status;
+}
+
+CmdStatus CmdInterface::countLeafsHandler() {
+  CmdStatus status;
+  status.status = SUCCESS;
+  status.msg = "";
+  int result = tree->countLeafs(status);
+  if (status.status != ERROR){
+    std::cout << result << std::endl;
+  }
   return status;
 }
 

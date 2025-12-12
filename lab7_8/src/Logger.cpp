@@ -27,8 +27,3 @@ std::string Logger::_getCurrentTime() {
   return std::string(buffer);
 }
 
-void Logger::log(const std::string& message) {
-  if (_logFile.is_open()) {
-    _logFile << _getCurrentTime() << " " << message << std::endl;
-  }
-}

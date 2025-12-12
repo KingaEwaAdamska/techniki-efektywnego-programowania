@@ -9,11 +9,9 @@ class Logger {
     Logger(const std::string& filename);
     ~Logger();
 
-    void log(const std::string& message);
-
     template <typename T, typename E>
     void logResult(Result<T, E>& result) {
-      _logFile << _getCurrentTime() << " " << result.errorsToString() << std::endl;
+      _logFile << _getCurrentTime() << " " << std::endl;
     }
 
   private:

@@ -72,8 +72,13 @@ OperatorNode::~OperatorNode() {
   }
 }
 
-Node* OperatorNode::getLeaf() {
-  return childs[0]->getLeaf(); 
+int OperatorNode::getLeafAmount() {
+  int leafs = 0;
+  int childsSize = childs.size();
+  for (int i = 0; i < childsSize; i++) {
+    leafs += childs[i]->getLeafAmount();
+  }
+  return leafs; 
 }
 
 void OperatorNode::changeChild(Node *newChild){
@@ -174,8 +179,8 @@ NumberNode::NumberNode(float val, Node *parent) : Node(parent){
   value = val;
 }
 
-Node* NumberNode::getLeaf() {
-  return this;
+int NumberNode::getLeafAmount() {
+  return 1;
 }
 
 float NumberNode::getValue(){
@@ -220,8 +225,8 @@ std::string VarNode::toString() {
   return var->name;
 }
 
-Node* VarNode::getLeaf() {
-  return this;
+int VarNode::getLeafAmount() {
+  return 1;
 }
 
 Variable* VarNode::addVariable(std::string var, std::vector<Variable*> *variables) {

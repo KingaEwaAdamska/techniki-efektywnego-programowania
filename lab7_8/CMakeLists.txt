@@ -17,6 +17,7 @@ add_executable(Lab7_8
     src/main.cpp
     src/Error.cpp
     src/Logger.cpp
+    src/Result.cpp
     src/Node.cpp
     src/Tree.cpp
     src/CmdInterface.cpp

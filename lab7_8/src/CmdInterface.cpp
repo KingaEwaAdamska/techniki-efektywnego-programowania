@@ -1,4 +1,5 @@
 #include "CmdInterface.hpp"
+#include "Result.hpp"
 
 #include <iostream>
 #include <string>
@@ -58,7 +59,7 @@ void CmdInterface::varsHandler(){
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
   if (result.errorsExist()){
-    std::cout << result.errorsToString() << std::endl;
+    std::cout << std::endl;
     logger->logResult(result);
   }
 }
@@ -68,7 +69,7 @@ void CmdInterface::printHandler(){
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
   if (result.errorsExist()){
-    std::cout << result.errorsToString() << std::endl;
+    std::cout << std::endl;
     logger->logResult(result);
   }
 }
@@ -78,7 +79,7 @@ void CmdInterface::compHandler(){
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
   if (result.errorsExist()){
-    std::cout << result.errorsToString() << std::endl;
+    std::cout << std::endl;
     logger->logResult(result);
   }
 }
@@ -96,7 +97,7 @@ void CmdInterface::countLeafsHandler() {
   if (result.isSuccess())
     std::cout << result.getValue() << std::endl;
   if (result.errorsExist()){
-    std::cout << result.errorsToString() << std::endl;
+    std::cout << std::endl;
     logger->logResult(result);
   }
 }

@@ -1,7 +1,6 @@
 #ifndef INTERFACE_HPP
 #define INTERFACE_HPP
 
-#include "CmdStatus.hpp"
 #include "Tree.hpp"
 #include <string>
 #include <vector>
@@ -12,11 +11,13 @@ class CmdInterface {
     std::string command;
     std::vector<std::string> *tokens;
 
-    CmdStatus enterHandler();
-    CmdStatus varsHandler();
-    CmdStatus printHandler();
-    CmdStatus compHandler();
-    CmdStatus joinHandler();
+    Result<void, Error> enterHandler();
+    Result<void, Error> varsHandler();
+    Result<void, Error> printHandler();
+    Result<void, Error> compHandler();
+    Result<void, Error> joinHandler();
+    Result<void, Error> countLeafsHandler();
+
     void helpHandler();
     void showWarning(const std::string &msg);
     void showError(const std::string &msg);

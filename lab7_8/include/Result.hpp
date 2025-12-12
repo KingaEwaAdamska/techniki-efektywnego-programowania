@@ -4,9 +4,11 @@
 #include "Error.hpp"
 
 class Tree;
+class Node;
 
 template <typename T, typename E>
 class Result {
+    friend class Result<Tree*, Error>;
 public:
     Result();
     Result(const T& value);
@@ -37,14 +39,48 @@ private:
     std::vector<E*> _errors;
 };
 
+template<typename E>
+class Result<Tree*, E>{
+  public:
+    Result(Tree* value);
+    Result();
+    Result(std::vector<E*>& errors);
+    static Result<Tree*, E> fail(E* error);
+    static Result<Tree*, E> fail(std::vector<E*>& errors);
+    static Result<Tree*, E> ok(const Tree*& value);
+    void addError(E* error);
+    std::string errorsToString();
+    void joinErrors(const Result<Node*, E>& other);
+    bool errorsExist();
+ private:
+    Tree** _value;
+    std::vector<E*> _errors;   
+};
+
+template<typename E>
+Result<Tree*, E> Result<Tree*, E>::fail(E* error) {
+  Result<Tree*, E> res;
+  return res;
+}
+
 template<typename T, typename E>
 Result<T, E>::Result() {
+    _value = NULL;
+}
+
+template<typename E>
+Result<Tree*, E>::Result() {
     _value = NULL;
 }
 
 template<typename T, typename E>
 Result<T, E>::Result(const T& value) {
     this->_value = new T(value);
+}
+
+template<typename E>
+Result<Tree*, E>::Result(Tree* value) {
+    this->_value = &value;
 }
 
 template<typename T, typename E>
@@ -61,6 +97,15 @@ Result<T, E>::Result(E* error) {
 
 template<typename T, typename E>
 Result<T, E>::Result(std::vector<E*>& errors) {
+    this->_value = NULL;
+    int size = errors.size();
+
+    for (int i = 0; i < size; i++) {
+        this->_errors.push_back(new E(*(errors[i])));
+    }
+}
+template<typename E>
+Result<Tree*, E>::Result(std::vector<E*>& errors) {
     this->_value = NULL;
     int size = errors.size();
 
@@ -113,6 +158,10 @@ Result<T, E> Result<T, E>::fail(std::vector<E*>& errors) {
     return Result<T, E>(errors);
 }
 
+template<typename E>
+Result<Tree*, E> Result<Tree*, E>::fail(std::vector<E*>& errors) {
+    return Result<Tree*, E>(errors);
+}
 template<typename T, typename E>
 Result<T, E>& Result<T, E>::operator=(const Result<T, E>& other) {
     if (this != &other) {
@@ -138,6 +187,12 @@ bool Result<T, E>::errorsExist() {
     return !_errors.empty();
 }
 
+
+template<typename E>
+bool Result<Tree*, E>::errorsExist() {
+    return !_errors.empty();
+}
+
 template<typename T, typename E>
 T& Result<T, E>::getValue() {
     return *this->_value;
@@ -157,6 +212,15 @@ void Result<T, E>::joinErrors(const Result<T, E>& other) {
     }
 }
 
+template<typename E>
+void Result<Tree*, E>::joinErrors(const Result<Node*, E>& other) {
+    int size = other._errors.size();
+    for (int i = 0; i < size; i++) {
+        E* copied_error = new E(*(other._errors[i]));
+        this->_errors.push_back(copied_error);
+    }
+}
+
 template<typename T, typename E>
 void Result<T, E>::addValue(const T& val) {
     _value = new T(val);
@@ -167,8 +231,12 @@ void Result<T, E>::addError(E* error) {
     _errors.push_back(error);
 }
 
-template<typename T, typename E>
-std::string Result<T, E>::errorsToString() {
+template<typename E>
+void Result<Tree*, E>::addError(E* error) {
+    _errors.push_back(error);
+}
+template<typename E>
+std::string Result<Tree*, E>::errorsToString() {
   std::string result = "";
   int size = _errors.size();
   for (int i = 0; i < size; i++) {
