@@ -28,9 +28,11 @@ public:
     bool errorsExist();
     T& getValue();
     std::vector<E*>& getErrors();
+
     void joinErrors(const Result<T, E>& other);
     void addValue(const T& val);
     void addError(E* error);
+
     std::string errorsToString();
 
 private:
@@ -88,9 +90,8 @@ Result<T, E>::Result(const Result<T, E>& other) {
 template<typename T, typename E>
 Result<T, E>::~Result() {
     delete _value;
-    int errorsSize = _errors.size();
-    for (int i = 0; i < errorsSize; i++) {
-        delete _errors[i];
+    for (E* err : _errors) {
+        delete err;
     }
 }
 
@@ -117,14 +118,9 @@ Result<T, E> Result<T, E>::fail(std::vector<E*>& errors) {
 template<typename T, typename E>
 Result<T, E>& Result<T, E>::operator=(const Result<T, E>& other) {
     if (this != &other) {
-        delete this->_value;
-
-        if (other._value)
-            this->_value = new T(*other._value);
-        else
-            this->_value = NULL;
-
-        this->_errors = other._errors;
+        delete _value;
+        _value = other._value ? new T(*other._value) : nullptr;
+        _errors = other._errors; // Shallow copy, deep copy of errors handled in destructor
     }
     return *this;
 }
@@ -141,20 +137,18 @@ bool Result<T, E>::errorsExist() {
 
 template<typename T, typename E>
 T& Result<T, E>::getValue() {
-    return *this->_value;
+    return *_value;
 }
 
 template<typename T, typename E>
 std::vector<E*>& Result<T, E>::getErrors() {
-    return this->_errors;
+    return _errors;
 }
 
 template<typename T, typename E>
 void Result<T, E>::joinErrors(const Result<T, E>& other) {
-    int size = other._errors.size();
-    for (int i = 0; i < size; i++) {
-        E* copied_error = new E(*(other._errors[i]));
-        this->_errors.push_back(copied_error);
+    for (E* err : other._errors) {
+        _errors.push_back(new E(*err));
     }
 }
 
@@ -169,98 +163,117 @@ void Result<T, E>::addError(E* error) {
 }
 
 template<typename T, typename E>
-std::string Result<T,E>::errorsToString() {
-    std::string result = "";
-    int size = _errors.size();
-    for (int i = 0; i < size; i++) {
-    if (!result.empty()) {
-        result += "\n";
-    }
-    result += _errors[i]->toString();
+std::string Result<T, E>::errorsToString() {
+    std::string result;
+    for (size_t i = 0; i < _errors.size(); ++i) {
+        if (i > 0) result += "\n";
+        result += _errors[i]->toString();
     }
     return result;
 }
 
-
 template<typename E>
 class Result<void, E> {
 public:
-    Result() {}
+    Result();
+    Result(E* error);
+    Result(std::vector<E*>& errors);
+    Result(const Result<void, E>& other);
+    ~Result() = default;
 
-    Result<void, E>(E* error){
-      _errors.push_back(error);
-    }
+    static Result<void, E> ok();
+    static Result<void, E> warning(E* error);
+    static Result<void, E> fail(E* error);
+    static Result<void, E> fail(std::vector<E*>& errors);
 
-    Result<void, E>(std::vector<E*>& errors){
-      this->_errors = errors;
-    }
+    std::string errorsToString();
+    void addError(E* error);
 
-    Result<void, E>(const Result<void, E>& other){
-      int size = other._errors.size();
+    bool isSuccess() const;
+    bool errorsExist();
 
-      for (int i = 0; i < size; i++) {
-        this->_errors.push_back(new E(*(other._errors[i])));
-      }
-    }
+    void joinErrors(const Result<void, E>& other);
 
-    static Result<void, E> ok(){
-      Result<void, E> res;
-      res._success = true;
-      return res;
-    }
-
-    static Result<void, E> warning(E* error) {
-      Result<void, E> res(error);
-      res._success = true;
-      return res;
-    }
-
-    static Result<void, E> fail(E* error) {
-      Result<void, E> res(error);
-      res._success = false;
-      return res;
-    }
-
-    static Result<void, E> fail(std::vector<E*>& errors) {
-      Result<void, E> res(errors);
-      res._success = false;
-      return res;
-    }
-
-    std::string errorsToString() {
-      std::string result = "";
-      int size = _errors.size();
-      for (int i = 0; i < size; i++) {
-        if (!result.empty()) {
-          result += "\n";
-        }
-        result += _errors[i]->toString();
-      }
-      return result;
-    }
-
-    void addError(E* error) {
-        _errors.push_back(error);
-    }
-
-    bool isSuccess() const {
-        return _success;
-    }
-
-    bool errorsExist() {
-      return !_errors.is_empty();
-    }
-
-    void joinErrors(const Result<void, E>& other) {
-      int size = other._errors.size();
-      for (int i = 0; i < size; i++) {
-        E* copied_error = new E(*(other._errors[i]));
-        this->_errors.push_back(copied_error);
-      }
-    }
-    
 private:
     std::vector<E*> _errors;
     bool _success;
 };
+
+template<typename E>
+Result<void, E>::Result() {}
+
+template<typename E>
+Result<void, E>::Result(E* error) {
+    _errors.push_back(error);
+}
+
+template<typename E>
+Result<void, E>::Result(std::vector<E*>& errors) : _errors(errors) {}
+
+template<typename E>
+Result<void, E>::Result(const Result<void, E>& other) {
+    for (E* err : other._errors) {
+        _errors.push_back(new E(*err));
+    }
+}
+
+template<typename E>
+Result<void, E> Result<void, E>::ok() {
+    Result<void, E> res;
+    res._success = true;
+    return res;
+}
+
+template<typename E>
+Result<void, E> Result<void, E>::warning(E* error) {
+    Result<void, E> res(error);
+    res._success = true;
+    return res;
+}
+
+template<typename E>
+Result<void, E> Result<void, E>::fail(E* error) {
+    Result<void, E> res(error);
+    res._success = false;
+    return res;
+}
+
+template<typename E>
+Result<void, E> Result<void, E>::fail(std::vector<E*>& errors) {
+    Result<void, E> res(errors);
+    res._success = false;
+    return res;
+}
+
+template<typename E>
+std::string Result<void, E>::errorsToString() {
+    std::string result;
+    for (size_t i = 0; i < _errors.size(); ++i) {
+        if (i > 0) result += "\n";
+        result += _errors[i]->toString();
+    }
+    return result;
+}
+
+template<typename E>
+void Result<void, E>::addError(E* error) {
+    _errors.push_back(error);
+}
+
+template<typename E>
+bool Result<void, E>::isSuccess() const {
+    return _success;
+}
+
+template<typename E>
+bool Result<void, E>::errorsExist() {
+    return !_errors.empty();
+}
+
+template<typename E>
+void Result<void, E>::joinErrors(const Result<void, E>& other) {
+    for (E* err : other._errors) {
+        _errors.push_back(new E(*err));
+    }
+}
 
