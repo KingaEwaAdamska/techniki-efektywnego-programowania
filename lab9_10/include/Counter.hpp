@@ -7,4 +7,4 @@ class Counter {
     int get();
   private:
     int count;
-}
+};

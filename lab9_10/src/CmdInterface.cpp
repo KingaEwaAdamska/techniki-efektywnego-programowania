@@ -1,5 +1,4 @@
 #include "CmdInterface.hpp"
-#include "MySmartPtr.hpp"
 #include "Result.hpp"
 #include <iostream>
 #include <string>
@@ -7,15 +6,10 @@
 #include <memory>
 
 CmdInterface::CmdInterface() : currentTreeName("default") {
-  trees[currentTreeName] = new Tree();
+    trees[currentTreeName] = MySmartPtr<Tree>(new Tree());
 }
 
-CmdInterface::~CmdInterface(){
-  for (auto& pair : trees) {
-    delete pair.second;
-  }
-  trees.clear();
-}
+CmdInterface::~CmdInterface() {}
 
 bool CmdInterface::isValidTreeName(const std::string& name) {
   if (name.empty()) return false;
@@ -29,20 +23,18 @@ bool CmdInterface::isValidTreeName(const std::string& name) {
   return true;
 }
 
-Tree* CmdInterface::getCurrentTree() {
+MySmartPtr<Tree> CmdInterface::getCurrentTree() {
   auto it = trees.find(currentTreeName);
-  if (it != trees.end()) {
-      return it->second;
-  }
-  return nullptr;
+  if (it != trees.end())
+    return it->second;
+  return MySmartPtr<Tree>(nullptr);
 }
 
-Tree* CmdInterface::getTreeByName(const std::string& name) {
+MySmartPtr<Tree> CmdInterface::getTreeByName(const std::string& name) {
   auto it = trees.find(name);
-  if (it != trees.end()) {
-      return it->second;
-  }
-  return nullptr;
+  if (it != trees.end())
+    return it->second;
+  return MySmartPtr<Tree>(nullptr);
 }
 
 void CmdInterface::commandHandler() {
@@ -81,7 +73,7 @@ void CmdInterface::commandHandler() {
 }
 
 void CmdInterface::enterHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
@@ -94,7 +86,7 @@ void CmdInterface::enterHandler() {
 }
 
 void CmdInterface::varsHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
@@ -109,7 +101,7 @@ void CmdInterface::varsHandler() {
 }
 
 void CmdInterface::printHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
@@ -124,7 +116,7 @@ void CmdInterface::printHandler() {
 }
 
 void CmdInterface::compHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
@@ -139,18 +131,17 @@ void CmdInterface::compHandler() {
 }
 
 void CmdInterface::joinHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
   }
   
-  Tree* newTree = new Tree();
+  MySmartPtr newTree(new Tree());
   Result<Tree*, Error> result = newTree->createTree(tokens);
   
   if (result.errorsExist()) {
     std::cout << result.errorsToString() << std::endl;
-    delete newTree;
     return;
   }
   
@@ -158,12 +149,10 @@ void CmdInterface::joinHandler() {
   if (joinResult.errorsExist()) {
     std::cout << joinResult.errorsToString() << std::endl;
   }
-  
-  delete newTree;
 }
 
 void CmdInterface::countLeafsHandler() {
-  Tree* currentTree = getCurrentTree();
+  MySmartPtr<Tree> currentTree = getCurrentTree();
   if (!currentTree) {
     std::cout << "Current tree not found" << std::endl;
     return;
@@ -179,44 +168,49 @@ void CmdInterface::countLeafsHandler() {
 
 void CmdInterface::assignHandler() {
     if (tokens->size() < 3) {
-        std::cout << "Usage: assign <dest> = <source>   or   <dest> = <source1> + <source2>\n";
+        std::cout << "Usage: <dest> = <source> | <dest> = <source1> + <source2>\n";
         return;
     }
 
-    std::string destName = (*tokens)[0];
-    if (!isValidTreeName(destName)) {
-        std::cout << "Invalid destination tree name\n";
+    const std::string& dest = (*tokens)[0];
+    if (!isValidTreeName(dest)) {
+        std::cout << "Invalid destination name\n";
         return;
     }
 
     if ((*tokens)[1] != "=") {
-        std::cout << "Expected '=' after destination name\n";
+        std::cout << "Expected '='\n";
         return;
     }
 
-    /* ---------- dest = source1 + source2 ---------- */
     if (tokens->size() >= 5 && (*tokens)[3] == "+") {
-        std::string source1Name = (*tokens)[2];
-        std::string source2Name = (*tokens)[4];
-
-        MySmartPtr<Tree> it1 = trees.find(source1Name);
-        MySmartPtr<Tree> it2 = trees.find(source2Name);
+        auto it1 = trees.find((*tokens)[2]);
+        auto it2 = trees.find((*tokens)[4]);
 
         if (it1 == trees.end() || it2 == trees.end()) {
-            std::cout << "Source tree(s) not found\n";
+            std::cout << "Source tree not found\n";
             return;
         }
 
-        // tworzymy nowe drzewo
         MySmartPtr<Tree> newTree(new Tree());
         *newTree = *it1->second + *it2->second;
 
-        // przypisanie (stare drzewo, jeśli było, samo się zwolni)
-        trees[destName] = newTree;
+        trees[dest] = std::move(newTree);
+        // trees[dest] = newTree;
 
-        std::cout << "Tree '" << destName << "' created as sum of '"
-                  << source1Name << "' and '" <
+        std::cout << "Tree '" << dest << "' created\n";
+        return;
+    }
 
+    auto it = trees.find((*tokens)[2]);
+    if (it == trees.end()) {
+        std::cout << "Source tree not found\n";
+        return;
+    }
+
+    trees[dest] = it->second;
+    std::cout << "Tree '" << dest << "' assigned\n";
+}
 
 void CmdInterface::listTreesHandler() {
   std::cout << "Available trees:" << std::endl;

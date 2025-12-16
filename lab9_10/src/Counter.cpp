@@ -4,14 +4,16 @@ Counter::Counter(){
   count = 1;
 }
 
-Counter::add(){
+int Counter::add(){
   count++;
+  return count;
 }
 
-Counter::dec(){
+int Counter::dec(){
   count--;
+  return count;
 }
 
-Counter::get(){
+int Counter::get(){
   return count;
 }

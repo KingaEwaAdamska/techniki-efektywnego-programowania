@@ -3,13 +3,14 @@
 #define LOG_FILE "log.txt"
 
 #include "Tree.hpp"
+#include "MySmartPtr.hpp"
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 class CmdInterface {
   private:
-    std::unordered_map<std::string, Tree*> trees;
+    std::unordered_map<std::string, MySmartPtr<Tree>> trees;
     std::string currentTreeName;
     std::string command;
     std::vector<std::string> *tokens;
@@ -28,8 +29,8 @@ class CmdInterface {
     void showError(const std::string &msg);
     
     bool isValidTreeName(const std::string& name);
-    Tree* getCurrentTree();
-    Tree* getTreeByName(const std::string& name);
+    MySmartPtr<Tree> getCurrentTree();
+    MySmartPtr<Tree> getTreeByName(const std::string& name);
 
   public:
     CmdInterface();

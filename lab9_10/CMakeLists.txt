@@ -19,6 +19,7 @@ add_executable(Lab9_10
     src/Node.cpp
     src/Tree.cpp
     src/CmdInterface.cpp
+    src/Counter.cpp
     src/StringHandler.cpp
 )
 
