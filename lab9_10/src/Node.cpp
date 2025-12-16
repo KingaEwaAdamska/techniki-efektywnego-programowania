@@ -261,3 +261,79 @@ Variable* VarNode::addVariable(std::string var, std::vector<Variable*> *variable
   variables->push_back(new Variable(var));
   return (*variables)[size];
 }
+
+Node* Node::clone() const {
+  return nullptr; 
+}
+
+// OperatorNode
+Node* OperatorNode::clone() const {
+  return nullptr; 
+}
+
+// AdditionNode
+Node* AdditionNode::clone() const {
+  AdditionNode* newNode = new AdditionNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// SubtractionNode
+Node* SubtractionNode::clone() const {
+  SubtractionNode* newNode = new SubtractionNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// MultiplicationNode
+Node* MultiplicationNode::clone() const {
+  MultiplicationNode* newNode = new MultiplicationNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// DivisionNode
+Node* DivisionNode::clone() const {
+  DivisionNode* newNode = new DivisionNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// SinusNode
+Node* SinusNode::clone() const {
+  SinusNode* newNode = new SinusNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// CosinusNode
+Node* CosinusNode::clone() const {
+  CosinusNode* newNode = new CosinusNode(nullptr);
+  for (size_t i = 0; i < childs.size(); i++) {
+    newNode->childs.push_back(childs[i]->clone());
+  }
+  return newNode;
+}
+
+// NumberNode
+Node* NumberNode::clone() const {
+  return new NumberNode(value, nullptr);
+}
+
+// VarNode
+Node* VarNode::clone() const {
+  VarNode* newNode = new VarNode(var->name, variables, nullptr);
+  newNode->var = this->var;
+  var->occurrings++;
+  return newNode;
+}

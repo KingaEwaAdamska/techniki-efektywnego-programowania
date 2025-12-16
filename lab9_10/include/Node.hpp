@@ -17,7 +17,7 @@ class Node {
     virtual int getLeafAmount() = 0;
     virtual float getValue() = 0;
     virtual std::string toString() = 0;
-
+    virtual Node* clone() const = 0; 
     Node* getParent();
 
     static Result<Node*, Error> createNode(const std::vector<std::string> *tokens, int &actToken, std::vector<Variable*> *variables);
@@ -36,7 +36,7 @@ class OperatorNode : public Node {
     int getLeafAmount();
     void changeChild(Node *newChild);
     static void joinSubtreeRoot(Node *subtreeRoot, OperatorNode *actNode);
-
+    virtual Node* clone() const override;
     OperatorNode(Node *parent = NULL);
 
   protected:
@@ -48,6 +48,7 @@ class AdditionNode : public OperatorNode {
   public:
     float getValue();
     std::string toString();
+    virtual Node* clone() const override;
 
     AdditionNode(Node *parent = NULL);
 };
@@ -55,6 +56,7 @@ class AdditionNode : public OperatorNode {
 class SubtractionNode : public OperatorNode {
   public:
     float getValue();
+    virtual Node* clone() const override;
     std::string toString();
 
     SubtractionNode(Node *parent = NULL);
@@ -64,6 +66,7 @@ class MultiplicationNode : public OperatorNode {
   public:
     float getValue();
     std::string toString();
+    virtual Node* clone() const override;
 
     MultiplicationNode(Node *parent = NULL);
 };
@@ -72,6 +75,7 @@ class DivisionNode : public OperatorNode {
   public:
     float getValue();
     std::string toString();
+    virtual Node* clone() const override;
 
     DivisionNode(Node *parent = NULL);
 };
@@ -80,6 +84,7 @@ class SinusNode : public OperatorNode {
   public:
     float getValue();
     std::string toString();
+    virtual Node* clone() const override;
 
     SinusNode(Node *parent = NULL);
 };
@@ -88,6 +93,7 @@ class CosinusNode : public OperatorNode {
   public:
     float getValue();
     std::string toString();
+    virtual Node* clone() const override;
 
     CosinusNode(Node *parent = NULL);
 };
@@ -97,6 +103,7 @@ class NumberNode : public Node {
     float getValue();
     std::string toString();
     int getLeafAmount();
+    virtual Node* clone() const override;
 
     NumberNode(float val, Node *parent = NULL);
 
@@ -112,6 +119,7 @@ class VarNode : public Node {
     ~VarNode();
 
     VarNode(std::string varName, std::vector<Variable*> *variables, Node *parent = NULL);
+    virtual Node* clone() const override;
 
   private: 
     Variable* var;
