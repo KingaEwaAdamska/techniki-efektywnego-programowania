@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Individual.hpp"
 #include "ProblemData.hpp"
-#include "Solution.hpp"
 
 class Evaluator {
 private:
@@ -9,5 +9,6 @@ private:
 
 public:
   Evaluator(ProblemData &problemData);
-  double evaluate(Solution *solution);
+  double evaluate(Individual &individual);
+  int &getDimension() { return problemData.getDimension(); }
 };

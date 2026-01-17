@@ -31,4 +31,5 @@ private:
 public:
   void loadProblemFromFile(std::string filename);
   void print() const;
+  int &getDimension() { return dimension; }
 }; // ProblemData

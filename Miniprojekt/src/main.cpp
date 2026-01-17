@@ -8,4 +8,6 @@ int main() {
 
   Evaluator evaluator(problemData);
   Optimizer optimizer(evaluator);
+
+  optimizer.init();
 }
