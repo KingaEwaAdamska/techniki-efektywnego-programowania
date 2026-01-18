@@ -9,6 +9,23 @@ struct Individual {
 
   Individual() : vals(new int[Config::getGenLen()]) {}
 
+  Individual(const Individual &other)
+      : vals(new int[Config::getGenLen()]), eval_val(other.eval_val) {
+    for (int i = 0; i < Config::getGenLen(); i++)
+      vals[i] = other.vals[i];
+  }
+
+  ~Individual() { delete[] vals; }
+
+  Individual &operator=(const Individual &other) {
+    if (this != &other) {
+      eval_val = other.eval_val;
+      for (int i = 0; i < Config::getGenLen(); i++)
+        vals[i] = other.vals[i];
+    }
+    return *this;
+  }
+
   void print() const {
     std::cout << "[ ";
     for (int i = 0; i < Config::getGenLen(); i++) {
@@ -16,6 +33,4 @@ struct Individual {
     }
     std::cout << "]  eval = " << eval_val << std::endl;
   }
-
-  ~Individual() { delete[] vals; }
 };

@@ -14,11 +14,12 @@ int main() {
   Optimizer optimizer(evaluator);
 
   optimizer.init();
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < Config::maxIterations; i++) {
     optimizer.runIteration();
   }
 
+  optimizer.printPopSize();
   Individual &ind = optimizer.getCurrentBestSolution();
-  std::cout << "docieram tu" << std::endl;
+
   ind.print();
 }

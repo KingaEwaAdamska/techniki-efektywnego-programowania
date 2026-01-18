@@ -10,6 +10,7 @@ private:
 
   std::vector<std::vector<int>> *buildRoutes(Individual &individual);
   double evalRouteLen(std::vector<int> &route);
+  double evalCapacityPenalty(const std::vector<int> &route);
 
 public:
   Evaluator(ProblemData &problemData);

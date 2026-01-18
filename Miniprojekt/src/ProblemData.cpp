@@ -102,6 +102,12 @@ void ProblemData::loadProblemFromFile(std::string filename) {
           permutation[i++] = customerId;
         }
       }
+    } else if (line.find("DISTANCE") != std::string::npos) {
+      size_t colon_pos = line.find(':');
+      if (colon_pos != std::string::npos) {
+        double distance = stod(line.substr(colon_pos + 1));
+        maxDistance = distance;
+      }
     } else if (line.find("EOF") != std::string::npos) {
       break;
     }
@@ -114,6 +120,7 @@ void ProblemData::print() const {
   std::cout << "Type: " << type << '\n';
   std::cout << "Dimension: " << Config::dimension << '\n';
   std::cout << "Capacity: " << capacity << "\n\n";
+  std::cout << "Distance: " << maxDistance << "\n\n";
 
   std::cout << "Demands:\n";
   for (int i = 0; i < Config::dimension; ++i) {

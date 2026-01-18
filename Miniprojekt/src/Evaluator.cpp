@@ -14,7 +14,13 @@ double Evaluator::evaluate(Individual &individual) {
   std::vector<std::vector<int>> *routes = buildRoutes(individual);
 
   for (int i = 0; i < Config::numberOfGroups; i++) {
-    evaluated_val += evalRouteLen((*routes)[i]);
+    double len = evalRouteLen((*routes)[i]);
+    if (problemData.getMaxDistance() != 0.0 &&
+        len > problemData.getMaxDistance()) {
+      evaluated_val += Config::lenPenalty;
+    }
+    evaluated_val += len;
+    evaluated_val += evalCapacityPenalty((*routes)[i]);
   }
 
   delete routes;
@@ -61,4 +67,19 @@ double Evaluator::evalRouteLen(std::vector<int> &route) {
   len += problemData.getDistance(route.back() - 1, 0);
 
   return len;
+}
+
+double Evaluator::evalCapacityPenalty(const std::vector<int> &route) {
+  int load = 0;
+
+  for (int city : route) {
+    load += problemData.getDemand(city - 1);
+  }
+
+  int excess = load - problemData.getCapacity();
+  if (excess > 0) {
+    return Config::capacityPenalty;
+  }
+
+  return 0.0;
 }

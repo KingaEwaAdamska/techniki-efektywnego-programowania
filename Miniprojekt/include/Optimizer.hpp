@@ -12,9 +12,14 @@ private:
   std::vector<Individual *> population;
   std::mt19937 randomGenerator;
 
-  Individual &createRandomIndividual();
+  Individual *createRandomIndividual();
   void removeWeakest(int numToRm);
   void mutate();
+
+  // mutating styles
+  Individual *randomChangeInGen();
+  Individual *parentsMerge();
+  Individual *mergeSmallGroups();
 
 public:
   Optimizer(Evaluator &evaluator);
@@ -24,4 +29,5 @@ public:
   void runIteration();
   Individual &getCurrentBestSolution();
   void showIndividual(Individual &individual);
+  void printPopSize();
 };
