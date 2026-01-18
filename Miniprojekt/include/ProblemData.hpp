@@ -21,7 +21,6 @@ struct Coordinate {
 
 class ProblemData {
 private:
-  int dimension;
   int capacity;
   int *permutation; // kolejność miast po id
   int *demands;     // wymagania w kolejności id
@@ -31,5 +30,6 @@ private:
 public:
   void loadProblemFromFile(std::string filename);
   void print() const;
-  int &getDimension() { return dimension; }
+  int getPerm(int id) { return permutation[id]; }
+  double getDistance(int x, int y);
 }; // ProblemData

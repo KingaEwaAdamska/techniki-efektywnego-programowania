@@ -17,5 +17,4 @@ add_executable(Miniprojekt
     src/Optimizer.cpp
     src/Evaluator.cpp
     src/ProblemData.cpp
-    src/Config.cpp
 )

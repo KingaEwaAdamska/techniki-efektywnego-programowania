@@ -10,13 +10,15 @@ private:
   Evaluator &evaluator;
   ProblemData problemData;
   std::vector<Individual *> population;
-  int dimension;
   std::mt19937 randomGenerator;
 
   Individual &createRandomIndividual();
+  void removeWeakest(int numToRm);
+  void mutate();
 
 public:
   Optimizer(Evaluator &evaluator);
+  ~Optimizer();
 
   void init();
   void runIteration();
